@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./fontawesome/css/all.min.css" />
+    <title>919DESIGN Svelte Kit</title>
+  <script type="module" crossorigin src="./assets/index-Lx8nPvQV.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-C0aW0C7h.css">
+</head>
+
+<body>
+    <div id="app"></div>
+    <script>
+        (function(){
+            try {
+                var stored = localStorage.getItem('919admin_backgroundSettings');
+                if (!stored) return;
+                var settings = JSON.parse(stored);
+                if (!settings || !settings.value || settings.type === 'none') return;
+                var fullBg = settings.type === 'gradient'
+                    ? String(settings.value)
+                    : "linear-gradient(rgba(0,0,0," + (1 - 0.6) + "), rgba(0,0,0," + (1 - 0.6) + ")), url('" + String(settings.value).replace(/'/g, "\\'") + "')";
+                var extra = settings.type === 'gradient' ? '' : 'background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important;';
+                var css = ".app-card{background:" + fullBg + " !important;" + extra + "} .app-navbar{background:" + fullBg + " !important;" + extra + "}";
+                var style = document.createElement('style');
+                style.id = 'pre-bg-style';
+                style.type = 'text/css';
+                style.appendChild(document.createTextNode(css));
+                document.head.appendChild(style);
+                window.__PRE_BG_APPLIED__ = true;
+            } catch(e) {
+                // noop
+            }
+        })();
+    </script>
+</body>
+
+</html>

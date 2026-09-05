@@ -1,0 +1,13 @@
+# Extra folders convert.js scans for .ydd + .ytd clothing files.
+#
+# One folder per line. Lines starting with # are ignored.
+# Missing folders are skipped with a warning, never an error — so a
+# path on a drive that is currently unplugged is harmless.
+#
+# This means you can keep your working clothes wherever you like and
+# just double-click convert.bat: nothing needs to be copied into the
+# resource, and the originals are never modified (the converter only
+# READS them and writes the web .glb/.png into stream/models/).
+
+# Example (delete the # and change the path to your own):
+# C:\Users\me\Desktop\My clothes

@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Premium Safe Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="alarmOverlay" class="alarm-overlay hidden" aria-hidden="true">
+    <div class="alarm-overlay__veil"></div>
+    <div class="alarm-overlay__content">
+      <div class="alarm-overlay__kicker">SECURITY ALERT</div>
+      <div id="alarmOverlayTitle" class="alarm-overlay__title">SAFE UNDER ATTACK</div>
+      <div id="alarmOverlaySubtitle" class="alarm-overlay__subtitle">Break-in attempt detected</div>
+    </div>
+    <audio id="alarmSound" preload="auto"></audio>
+  </div>
+  <div id="app" class="hidden" aria-hidden="true">
+    <div class="ui-root">
+      <div class="bg-glow bg-glow-a"></div>
+      <div class="bg-glow bg-glow-b"></div>
+      <div class="shell">
+        <aside class="sidebar">
+          <div class="brand panel">
+            <div class="brand__icon">S</div>
+            <div class="brand__copy">
+              <div class="eyebrow">Premium Secure Storage</div>
+              <h1 id="safeTitle">Safe Dashboard</h1>
+              <div class="brand__sub muted">Secure stash management</div>
+            </div>
+          </div>
+          <nav class="nav panel">
+            <button class="nav__item active" data-tab="overview">Overview</button>
+            <button class="nav__item" data-tab="access">Access</button>
+            <button class="nav__item" data-tab="progress">Progress</button>
+            <button class="nav__item" data-tab="logs">Logs</button>
+            <button class="nav__item" data-tab="settings">Settings</button>
+          </nav>
+          <div class="owner-card panel">
+            <div class="muted">Owner</div>
+            <div id="ownerName" class="owner-name">Unknown</div>
+            <div id="groupAssignment" class="badge">Unassigned</div>
+          </div>
+        </aside>
+        <main class="content">
+          <header class="topbar panel">
+            <div class="status-block">
+              <div class="eyebrow">Live Status</div>
+              <div id="statusText" class="title-sm">No safe selected</div>
+            </div>
+            <div class="topbar__actions">
+              <button id="depositBtn" class="btn btn-secondary">Deposit</button>
+              <button id="withdrawBtn" class="btn btn-primary">Withdraw</button>
+              <button id="closeBtn" class="btn btn-ghost">Close</button>
+            </div>
+          </header>
+          <section id="overview" class="tab active">
+            <div class="grid grid-overview">
+              <div class="panel stat-card">
+                <div class="muted">Tracked Items</div>
+                <div id="trackedItemsList" class="list compact-list"></div>
+              </div>
+              <div class="panel stat-card">
+                <div class="muted">Storage</div>
+                <div id="storageTier" class="stat-value stat-value--md">Base</div>
+                <div id="storageStats" class="muted">45 slots • 250000g</div>
+              </div>
+              <div class="panel progress-panel full-span">
+                <div class="row between center wrap">
+                  <div>
+                    <div class="title-sm">Total Progress</div>
+                    <div id="totalProgressText" class="muted">0 / 0</div>
+                  </div>
+                  <div id="topContributor" class="badge">No top contributor</div>
+                </div>
+                <div class="progress-bar"><span id="totalProgressBar"></span></div>
+              </div>
+              <div class="panel list-panel">
+                <div class="row between center"><div class="title-sm">Met Quota</div><div class="muted">Completed targets</div></div>
+                <div id="completedList" class="list"></div>
+              </div>
+              <div class="panel list-panel">
+                <div class="row between center"><div class="title-sm">Still In Progress</div><div class="muted">Outstanding targets</div></div>
+                <div id="incompleteList" class="list"></div>
+              </div>
+            </div>
+          </section>
+          <section id="access" class="tab">
+            <div class="grid grid-access">
+               <div class="panel">
+                 <div class="title-sm">Add Access</div>
+                 <div class="muted">Search for an online player or enter a citizen ID manually.</div>
+                 <div class="form-grid">
+                   <input id="playerSearch" class="input" placeholder="Search nearby player by character name or citizen ID">
+                   <div id="playerSearchResults" class="search-results"><div class="muted">Search for a nearby online player to add them.</div></div>
+                   <input id="accessIdentifier" class="input" placeholder="Citizen ID (enter manually or auto-filled from search)">
+                   <button id="addAccessBtn" class="btn btn-primary">Add User</button>
+                 </div>
+               </div>
+               <div class="panel">
+                 <div class="title-sm">Current Assignment</div>
+                 <div class="muted">A label to tag this safe (e.g., gang, job, business). For tracking purposes only.</div>
+                 <div id="assignmentSummary" class="muted">No group/business assigned.</div>
+               </div>
+              <div class="panel list-panel full-span">
+                <div class="title-sm">Allowed Users & Permissions</div>
+                <div id="accessList" class="list"></div>
+              </div>
+            </div>
+          </section>
+          <section id="progress" class="tab">
+            <div class="grid grid-tracking">
+              <div class="panel full-span">
+                <div class="row between center">
+                  <div>
+                    <div class="title-sm">Period Tracking</div>
+                    <div id="periodStatus" class="muted">No active period</div>
+                  </div>
+                  <div class="row gap-sm">
+                    <button id="addMemberBtn" class="btn btn-secondary">Add Member</button>
+                    <button id="archiveBtn" class="btn btn-secondary">View Archives</button>
+                    <button id="endPeriodBtn" class="btn btn-primary">End Period</button>
+                  </div>
+                </div>
+              </div>
+              <div class="panel list-panel full-span">
+                <div class="title-sm">Member Progress</div>
+                <div id="memberProgressList" class="list"></div>
+              </div>
+            </div>
+          </section>
+          <div id="addMemberModal" class="modal hidden" aria-hidden="true">
+            <div class="modal__backdrop"></div>
+            <div class="modal__content panel">
+              <div class="title-sm">Add Tracker Member</div>
+              <div class="muted">Add a member manually. They do not need to be online.</div>
+              <div class="form-grid">
+                <input id="newMemberName" class="input" placeholder="Member name (e.g., John Doe)">
+                <input id="newMemberCitizenid" class="input" placeholder="Link citizen ID (optional)">
+                <div class="row gap-sm">
+                  <button id="confirmAddMemberBtn" class="btn btn-primary">Add Member</button>
+                  <button id="cancelAddMemberBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="editProgressModal" class="modal hidden" aria-hidden="true">
+            <div class="modal__backdrop"></div>
+            <div class="modal__content panel">
+              <div class="title-sm">Adjust Progress</div>
+              <div id="editMemberName" class="muted"></div>
+              <div class="form-grid">
+                <select id="editItemSelect" class="input"></select>
+                <input id="editAmountInput" class="input" type="number" min="0" placeholder="Amount">
+                <div class="row gap-sm">
+                  <button id="confirmEditProgressBtn" class="btn btn-primary">Save</button>
+                  <button id="cancelEditProgressBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="periodSettingsModal" class="modal hidden" aria-hidden="true">
+            <div class="modal__backdrop"></div>
+            <div class="modal__content panel">
+              <div class="title-sm">Period Duration</div>
+              <div class="muted">Set to 0 for manual period end only.</div>
+              <div class="form-grid">
+                <input id="periodDaysInput" class="input" type="number" min="0" placeholder="Days">
+                <div class="row gap-sm">
+                  <button id="confirmPeriodDaysBtn" class="btn btn-primary">Save</button>
+                  <button id="cancelPeriodDaysBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="archivesModal" class="modal hidden" aria-hidden="true">
+            <div class="modal__backdrop"></div>
+            <div class="modal__content panel" style="min-width: 600px;">
+              <div class="row between center">
+                <div class="title-sm">Period Archives</div>
+                <button id="closeArchivesBtn" class="btn btn-ghost">Close</button>
+              </div>
+              <div id="archivesList" class="list"></div>
+            </div>
+          </div>
+          <section id="logs" class="tab"><div class="grid"><div class="panel list-panel full-span"><div class="title-sm">Activity Log</div><div id="logsList" class="list"></div></div></div></section>
+           <section id="settings" class="tab">
+             <div class="grid grid-settings">
+               <div class="panel">
+                 <div class="title-sm">Tracking Configuration</div>
+                <div class="form-grid">
+                  <label class="switch-row"><span>Enable Tracking</span><input id="trackingEnabled" type="checkbox"></label>
+                  <div id="trackedItemsEditor" class="tracked-items-editor"></div>
+                  <button id="addTrackedRowBtn" class="btn btn-secondary" type="button">Add Tracked Item Row</button>
+                  <button id="selectTrackedItemBtn" class="btn btn-secondary" type="button">Import Items From Inventory Selector</button>
+                  <select id="assignmentType" class="input"><option value="">No assignment</option><option value="job">Job</option><option value="gang">Gang</option><option value="business">Business</option><option value="organization">Organization</option><option value="faction">Faction</option><option value="police">Police</option><option value="custom">Custom</option></select>
+                  <input id="assignmentName" class="input" placeholder="Assignment name">
+                  <button id="saveSettingsBtn" class="btn btn-primary">Save Settings</button>
+                </div>
+              </div>
+              <div class="panel danger-zone">
+                <div class="title-sm">Storage Upgrades</div>
+                <div id="upgradeList" class="list"></div>
+               <div class="title-sm" style="margin-top:8px;">Security Upgrade</div>
+               <div id="alarmUpgradeCard" class="list"></div>
+                <div class="title-sm" style="margin-top:8px;">Access Control</div>
+                <div id="accessUpgradeCard" class="list"></div>
+                 <div id="ownerOnlineRequirementCard" class="list"></div>
+                <div class="title-sm" style="margin-top:8px;">Tracking</div>
+                <div id="trackingUpgradeCard" class="list"></div>
+                <div class="title-sm" style="margin-top:8px;">Danger Zone</div>
+                <button id="resetProgressBtn" class="btn btn-secondary">Reset Progress</button>
+                <button id="pickupSafeBtn" class="btn btn-danger">Pick Up Safe</button>
+              </div>
+            </div>
+            <div class="sound-toggle-bar">
+              <label class="toggle-row toggle-row--compact">
+                <span>Alarm Sounds</span>
+                <div class="toggle-switch toggle-switch--sm">
+                  <input id="alarmSoundToggle" type="checkbox" checked>
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+           </section>
+         </main>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

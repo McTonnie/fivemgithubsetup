@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Apex Clothing Studio — DUI receiver</title>
+    <!-- Deliberately bare: no fonts, no CDN, no stylesheets. This page
+         lives offscreen inside a DUI browser and must be paintable the
+         instant it loads — its only job is to receive composited canvas
+         frames (relayed by preview.lua via SendDuiMessage) and draw them
+         onto one full-window canvas that becomes a runtime texture. -->
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+        #c {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="c"></canvas>
+    <script src="js/dui.js"></script>
+</body>
+</html>

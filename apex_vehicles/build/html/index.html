@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Apex Vehicle Studio</title>
+    <!-- Everything is SELF-HOSTED under vendor/. A FiveM client is not
+         guaranteed to reach the internet — behind a firewall, or with a
+         CDN blocked, remote fonts/icons/three.js simply never arrive and
+         the studio opens broken (no icons, no 3D) with nothing in the
+         console to explain it. Vendored files always load. -->
+    <link rel="stylesheet" href="vendor/fonts/fonts.css?v=116">
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css?v=116">
+    <link rel="stylesheet" href="css/style.css?v=116">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     LOADING OVERLAY — HIDDEN on first paint. Shown only while
+     the studio is opening (the `loading` action) and hidden
+     again by the `boot` payload. Never visible on server join.
+     The ONLY element allowed to use backdrop-filter (house rule).
+     ═══════════════════════════════════════════════════════ -->
+<div id="loading-overlay" hidden>
+    <div class="spinner-ring"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     APP SHELL — grid: topbar 56px / workspace / statusbar 28px.
+     Hidden until app.js receives `open` (el.hidden = false).
+     ═══════════════════════════════════════════════════════ -->
+<div id="app" hidden>
+
+    <!-- ─── TOPBAR ──────────────────────────────────────── -->
+    <header id="topbar">
+        <div class="brand">
+            <div class="brand-mark"><i class="fa-solid fa-car"></i></div>
+            <div class="brand-wm">
+                <span data-i18n="brand_apex">APEX</span>
+                <span class="wm-accent" data-i18n="brand_studio">VEHICLES</span>
+            </div>
+        </div>
+
+        <span class="topbar-sep"></span>
+
+        <button id="project-pill" data-tip="Projects" data-i18n-tip="dock_projects" data-tip-pos="right">
+            <i class="fa-regular fa-folder-open"></i>
+            <span id="project-name" data-i18n="project_untitled">Untitled</span>
+            <span id="project-dirty" hidden></span>
+        </button>
+
+        <div class="topbar-spacer"></div>
+
+        <button id="btn-tutorial" data-tip="Interactive tutorial" data-i18n-tip="tip_tutorial" data-tip-pos="right">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </button>
+        <button id="btn-settings" data-tip="Settings &amp; appearance" data-i18n-tip="tip_settings" data-tip-pos="right">
+            <i class="fa-solid fa-sliders"></i>
+        </button>
+        <button id="btn-help" data-tip="Controls &amp; shortcuts" data-i18n-tip="tip_help" data-tip-pos="right">
+            <i class="fa-regular fa-keyboard"></i>
+        </button>
+        <button id="btn-ai-fit" class="btn btn-ghost" data-tip="Quick AI Fit" data-i18n-tip="topbar_ai_fit" data-tip-pos="right">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span class="btn-label" data-i18n="topbar_ai_fit">Quick AI Fit</span>
+        </button>
+        <button id="btn-save" class="btn btn-ghost" data-tip="Save" data-i18n-tip="topbar_save" data-tip-pos="right">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span class="btn-label" data-i18n="topbar_save">Save</span>
+        </button>
+        <!-- Live manager — clothes currently applied server-wide.
+             Plain (grey) icon button, above Export. -->
+        <button id="btn-live" data-tip="Live textures" data-i18n-tip="live_tip" data-tip-pos="right">
+            <i class="fa-solid fa-tower-broadcast"></i>
+        </button>
+        <button id="btn-export" class="btn btn-primary" data-tip="Export" data-i18n-tip="topbar_export" data-tip-pos="right">
+            <i class="fa-solid fa-file-export"></i>
+            <span class="btn-label" data-i18n="topbar_export">Export</span>
+        </button>
+        <!-- Reset everything — sits right above the close button. -->
+        <button id="btn-reset-all" class="side-reset" data-tip="Reset everything"
+                data-i18n-tip="reset_all_tip" data-tip-pos="right">
+            <i class="fa-solid fa-arrow-rotate-left"></i>
+        </button>
+        <button id="btn-close" data-tip="Close" data-i18n-tip="tip_close" data-tip-pos="right">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </header>
+
+    <!-- ─── WORKSPACE ───────────────────────────────────── -->
+    <div class="workspace">
+
+        <!-- ─── MODELS RAIL (template browser — studio parity) ── -->
+        <aside id="models-rail">
+            <div class="pane-head">
+                <span class="micro-label" data-i18n="models_title">Models</span>
+                <button id="btn-templates-refresh" class="btn-icon sm" data-tip="Rescan folder" data-i18n-tip="templates_refresh">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+            </div>
+            <!-- Search by name/category — always available, unlike the
+                 gender/category chips which hide when redundant. -->
+            <div class="tpl-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="tpl-search-input" class="tpl-search-input" type="text"
+                       placeholder="Search models…" data-i18n-ph="tpl_search_ph"
+                       spellcheck="false" autocomplete="off">
+                <button id="tpl-search-clear" class="tpl-search-clear" hidden data-tip="Clear" data-i18n-tip="tpl_search_clear">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <!-- One compact filter row: gender as icons, category chips
+                 beside them. panels.js hides the gender group when the
+                 catalog has only one gender, and the chips when there is
+                 only one category — the bar cleans itself up. -->
+            <div id="tpl-filterbar" class="tpl-filterbar">
+                <div class="tpl-gender seg-group" role="group">
+                    <button class="seg-btn active" data-gender="all" data-tip="All genders" data-i18n-tip="tpl_all">
+                        <i class="fa-solid fa-users"></i>
+                    </button>
+                    <button class="seg-btn" data-gender="male" data-tip="Male" data-i18n-tip="tpl_male">
+                        <i class="fa-solid fa-mars"></i>
+                    </button>
+                    <button class="seg-btn" data-gender="female" data-tip="Female" data-i18n-tip="tpl_female">
+                        <i class="fa-solid fa-venus"></i>
+                    </button>
+                </div>
+                <div id="tpl-components" class="tpl-filter"><!-- component chips by panels.js --></div>
+            </div>
+            <div class="pane-scroll">
+                <div id="tpl-grid" class="tpl-grid">
+                    <div class="empty-state small">
+                        <i class="fa-solid fa-car"></i>
+                        <span data-i18n="tpl_empty">No vehicles yet — run tools/convert.js to add your cars, see the README</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Tool rail — labelled buttons, collapsible to icons-only -->
+        <nav id="tool-rail">
+            <!-- 1 · AI — full-width flat-blue bar -->
+            <button class="tool-btn" data-tool="ai" data-tip="AI Texture" data-i18n-tip="tool_tip_ai" data-tip-pos="right"><i class="fa-solid fa-wand-magic-sparkles"></i><span class="rail-label" data-i18n="tool_lbl_ai">AI</span></button>
+            <!-- 3 · tools, web order: [select brush] [eraser fill] [pick text] [shape image] -->
+            <div class="rail-group">
+                <button class="tool-btn active" data-tool="select" data-tip="Select / Move (V)" data-i18n-tip="tool_tip_select" data-tip-pos="right"><i class="fa-solid fa-arrow-pointer"></i><span class="rail-label" data-i18n="tool_lbl_select">Select</span></button>
+                <button class="tool-btn" data-tool="marquee" data-tip="Select region (M)" data-i18n-tip="tool_marquee_tip" data-tip-pos="right"><i class="fa-solid fa-vector-square"></i><span class="rail-label" data-i18n="tool_marquee">Region</span></button>
+                <button class="tool-btn" data-tool="brush" data-tip="Brush (B)" data-i18n-tip="tool_tip_brush" data-tip-pos="right"><i class="fa-solid fa-paintbrush"></i><span class="rail-label" data-i18n="tool_brush">Brush</span></button>
+                <button class="tool-btn" data-tool="eraser" data-tip="Eraser (E)" data-i18n-tip="tool_tip_eraser" data-tip-pos="right"><i class="fa-solid fa-eraser"></i><span class="rail-label" data-i18n="tool_eraser">Eraser</span></button>
+                <button class="tool-btn" data-tool="fill" data-tip="Fill (F)" data-i18n-tip="tool_tip_fill" data-tip-pos="right"><i class="fa-solid fa-fill-drip"></i><span class="rail-label" data-i18n="tool_fill">Fill</span></button>
+                <button class="tool-btn" data-tool="eyedrop" data-tip="Eyedropper (I)" data-i18n-tip="tool_tip_eyedrop" data-tip-pos="right"><i class="fa-solid fa-eye-dropper"></i><span class="rail-label" data-i18n="tool_lbl_eyedrop">Picker</span></button>
+                <button class="tool-btn" data-tool="text" data-tip="Text (T)" data-i18n-tip="tool_tip_text" data-tip-pos="right"><i class="fa-solid fa-font"></i><span class="rail-label" data-i18n="tool_text">Text</span></button>
+                <button class="tool-btn" data-tool="shape" data-tip="Shape (S)" data-i18n-tip="tool_tip_shape" data-tip-pos="right"><i class="fa-solid fa-shapes"></i><span class="rail-label" data-i18n="tool_shape">Shape</span></button>
+                <button class="tool-btn" data-tool="image" data-tip="Image / Upload" data-i18n-tip="tool_tip_image" data-tip-pos="right"><i class="fa-solid fa-image"></i><span class="rail-label" data-i18n="tool_image">Image</span></button>
+                <button class="tool-btn" data-tool="pattern" data-tip="Pattern" data-i18n-tip="tool_tip_pattern" data-tip-pos="right"><i class="fa-solid fa-swatchbook"></i><span class="rail-label" data-i18n="tool_pattern">Pattern</span></button>
+            </div>
+            <!-- 4 · marquee modes — mirror the brush-type strip: they
+                 highlight while the Region tool is active, and clicking
+                 one both picks the mode AND switches to the tool -->
+            <div class="rail-group rail-marquee-modes">
+                <button class="tool-btn rail-marq-mode" data-mmode="rect" data-tip="Rectangle" data-i18n-tip="marq_rect" data-tip-pos="right"><i class="fa-regular fa-square"></i></button>
+                <button class="tool-btn rail-marq-mode" data-mmode="ellipse" data-tip="Ellipse" data-i18n-tip="marq_ellipse" data-tip-pos="right"><i class="fa-regular fa-circle"></i></button>
+                <button class="tool-btn rail-marq-mode" data-mmode="lasso" data-tip="Free lasso" data-i18n-tip="marq_lasso" data-tip-pos="right"><i class="fa-solid fa-draw-polygon"></i></button>
+                <button class="tool-btn rail-marq-mode" data-mmode="wand" data-tip="Magic wand" data-i18n-tip="marq_wand" data-tip-pos="right"><i class="fa-solid fa-wand-sparkles"></i></button>
+            </div>
+            <!-- 5 · brush types — highlight while the brush tool is active;
+                 clicking picks the type AND switches to the brush -->
+            <div class="rail-group rail-brush-types">
+                <button class="tool-btn rail-brush-type" data-btype="normal" data-tip="Normal" data-i18n-tip="brush_normal" data-tip-pos="right"><i class="fa-solid fa-paintbrush"></i></button>
+                <button class="tool-btn rail-brush-type" data-btype="spray" data-tip="Spray" data-i18n-tip="brush_spray" data-tip-pos="right"><i class="fa-solid fa-spray-can"></i></button>
+                <button class="tool-btn rail-brush-type" data-btype="marker" data-tip="Marker" data-i18n-tip="brush_marker" data-tip-pos="right"><i class="fa-solid fa-marker"></i></button>
+                <button class="tool-btn rail-brush-type" data-btype="pixel" data-tip="Pixel" data-i18n-tip="brush_pixel" data-tip-pos="right"><i class="fa-solid fa-square"></i></button>
+            </div>
+            <!-- 7 · undo / redo -->
+            <div class="rail-group">
+                <button id="btn-undo" class="tool-btn" data-tip="Undo (Ctrl+Z)" data-i18n-tip="tool_undo" data-tip-pos="right"><i class="fa-solid fa-rotate-left"></i><span class="rail-label" data-i18n="tool_undo">Undo</span></button>
+                <button id="btn-redo" class="tool-btn" data-tip="Redo (Ctrl+Y)" data-i18n-tip="tool_redo" data-tip-pos="right"><i class="fa-solid fa-rotate-right"></i><span class="rail-label" data-i18n="tool_redo">Redo</span></button>
+                <button id="rail-collapse" class="tool-btn" data-tip="Collapse" data-i18n-tip="rail_collapse" data-tip-pos="right"><i class="fa-solid fa-angles-left"></i><span class="rail-label" data-i18n="rail_collapse_lbl">Collapse</span></button>
+            </div>
+        </nav>
+
+        <!-- ─── 3D PREVIEW (isolated garment viewer) ────── -->
+        <section id="stage-panel">
+            <div class="stage-head">
+                <div class="stage-head-left">
+                    <i class="fa-solid fa-shirt stage-garment-ico"></i>
+                    <span id="template-name-chip" class="chip mono" data-i18n="viewer_none">No template</span>
+                </div>
+                <div class="stage-head-right">
+                    <!-- ON-CAR controls: live preview (texture replacement)
+                         and wrap mode (projected livery, for cars with no
+                         paintable texture at all) — wired by js/wrap.js -->
+                    <button id="preview-toggle" class="btn-icon car-btn" role="switch" aria-checked="false"
+                            data-tip="Live preview on the real car" data-i18n-tip="tip_preview_toggle">
+                        <i class="fa-solid fa-car-side"></i>
+                    </button>
+                    <button id="wrap-toggle" class="btn-icon car-btn" role="switch" aria-checked="false"
+                            data-tip="Wrap mode — paint cars with no livery slot" data-i18n-tip="tip_wrap_toggle">
+                        <i class="fa-solid fa-spray-can-sparkles"></i>
+                    </button>
+                    <button id="wrap-apply" class="btn-icon car-btn" hidden
+                            data-tip="Apply this wrap to the car for everyone" data-i18n-tip="tip_wrap_apply">
+                        <i class="fa-solid fa-share-nodes"></i>
+                    </button>
+                    <button id="wrap-remove" class="btn-icon car-btn danger" hidden
+                            data-tip="Remove the wrap from this car" data-i18n-tip="tip_wrap_remove">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                    <!-- The studio page is opaque: peeking hides it so the
+                         live preview on the real car is actually visible. -->
+                    <button id="peek-toggle" class="btn-icon car-btn"
+                            data-tip="Look at the real car (E to come back)" data-i18n-tip="tip_peek">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                    <span class="head-sep"></span>
+                    <button id="viewer-autorotate" class="btn-icon" data-tip="Auto-rotate" data-i18n-tip="viewer_autorotate">
+                        <i class="fa-solid fa-arrows-spin"></i>
+                    </button>
+                    <button id="viewer-wireframe" class="btn-icon" data-tip="Wireframe" data-i18n-tip="viewer_wireframe">
+                        <i class="fa-solid fa-draw-polygon"></i>
+                    </button>
+                    <button id="viewer-reset" class="btn-icon" data-tip="Reset view" data-i18n-tip="viewer_reset">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- three.js renders the isolated .glb garment here; the
+                 design on the right is applied live as its texture. -->
+            <div id="viewer-wrap">
+                <canvas id="viewer-canvas"></canvas>
+                <div id="viewer-empty" class="viewer-empty">
+                    <i class="fa-solid fa-cube"></i>
+                    <span data-i18n="viewer_empty">Add clothing templates in stream/models/ — see the README</span>
+                </div>
+                <div id="viewer-loading" class="viewer-loading" hidden>
+                    <span class="spin-ring"></span>
+                    <span data-i18n="viewer_loading">Loading model…</span>
+                </div>
+                <div id="tex-loading" class="tex-loading" hidden>
+                    <span class="spin-ring"></span>
+                    <span data-i18n="tex_loading">Loading texture…</span>
+                </div>
+                <!-- static glass hint badge, bottom-center (studio parity) -->
+                <div class="viewer-hint-badge" data-i18n="viewer_hint">Drag to rotate · Scroll to zoom</div>
+            </div>
+        </section>
+
+        <!-- ─── CANVAS EDITOR ───────────────────────────── -->
+        <section id="canvas-panel">
+            <div class="canvas-head">
+                <div class="canvas-head-left">
+                    <i class="fa-solid fa-vector-square"></i>
+                    <!-- texture variant dropdown (A/B/C…) filled by panels.js.
+                         The active texture NAME lives inside this control. -->
+                    <div id="texture-variants" class="tex-dd" hidden>
+                        <button id="tex-dd-btn" class="tex-dd-btn">
+                            <span id="tex-dd-current" class="tex-dd-cur">A</span>
+                            <span id="tex-dd-name" class="tex-dd-name mono">—</span>
+                            <i class="fa-solid fa-chevron-down tex-dd-caret"></i>
+                        </button>
+                        <div id="tex-dd-menu" class="tex-dd-menu" hidden></div>
+                    </div>
+                    <!-- texture CRUD: new / duplicate / rename / delete.
+                         Hidden until a garment is loaded (panels.js). -->
+                    <div id="tex-actions" class="tex-actions" hidden>
+                        <button id="btn-tex-new" class="btn-icon sm" data-tip="New texture" data-i18n-tip="tex_new_tip"><i class="fa-solid fa-plus"></i></button>
+                        <button id="btn-tex-dup" class="btn-icon sm" data-tip="Duplicate this texture" data-i18n-tip="tex_dup_tip"><i class="fa-regular fa-clone"></i></button>
+                        <button id="btn-tex-rename" class="btn-icon sm" data-tip="Rename this texture" data-i18n-tip="tex_rename_tip"><i class="fa-solid fa-pen"></i></button>
+                        <button id="btn-tex-del" class="btn-icon sm danger" data-tip="Delete this texture" data-i18n-tip="tex_del_tip"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <span id="canvas-title" class="mono" data-i18n="canvas_title">Canvas</span>
+                </div>
+                <div class="canvas-head-right">
+                    <!-- UV toggle + its opacity slider share ONE pill; the
+                         slider only unfolds while the guide is on (panels.js
+                         toggles .on on this container) -->
+                    <div id="uv-control" class="uv-control">
+                        <label class="uv-chip" data-tip="UV guide overlay" data-i18n-tip="tip_uv_toggle">
+                            <input type="checkbox" id="uv-toggle">
+                            <span data-i18n="canvas_uv">UV</span>
+                        </label>
+                        <input type="range" id="uv-opacity" min="0" max="100" value="50" data-tip="UV guide opacity" data-i18n-tip="tip_uv_opacity">
+                    </div>
+                    <button id="btn-download-png" class="btn-icon" data-tip="Download this texture as PNG (saved on the server PC, Desktop by default)" data-i18n-tip="tip_download_tex"><i class="fa-solid fa-download"></i></button>
+                    <!-- legacy head controls the web studio lacks — hidden via
+                         CSS, kept in the DOM because panels.js binds them -->
+                    <div class="zoom-group">
+                        <button id="zoom-out" class="btn-icon sm" data-tip="Zoom out" data-i18n-tip="tip_zoom_out"><i class="fa-solid fa-minus"></i></button>
+                        <span id="zoom-value" class="mono">100%</span>
+                        <button id="zoom-in" class="btn-icon sm" data-tip="Zoom in" data-i18n-tip="tip_zoom_in"><i class="fa-solid fa-plus"></i></button>
+                        <button id="btn-zoom-fit" class="btn-icon sm" data-tip="Fit to view" data-i18n-tip="tip_zoom_fit"><i class="fa-solid fa-compress"></i></button>
+                    </div>
+                    <button id="btn-reset-texture" class="btn-icon sm" data-tip="Reset texture to default" data-i18n-tip="tip_reset_texture"><i class="fa-solid fa-arrow-rotate-left"></i></button>
+                    <label class="toggle-chip grid-chip" data-tip="Pixel grid" data-i18n-tip="tip_grid_toggle">
+                        <input type="checkbox" id="grid-toggle">
+                        <span data-i18n="canvas_grid">Grid</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Contextual tool options — filled by panels.js, hidden while empty -->
+            <div id="tool-options"></div>
+
+            <div id="canvas-wrap">
+                <canvas id="editor-canvas" width="1024" height="1024"></canvas>
+                <canvas id="overlay-canvas" width="1024" height="1024"></canvas>
+                <div id="drop-hint" class="drop-hint" hidden>
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span data-i18n="drop_hint">Drop image to add a layer</span>
+                </div>
+
+                <!-- ─── TEXTURE PROPERTIES (floating right column) ───
+                     Fills the empty checker space on the right with
+                     live info + quick actions. Collapsible; panels.js
+                     fills #tex-props-body and toggles .collapsed. -->
+                <aside id="tex-props" class="tex-props">
+                    <button id="tex-props-toggle" class="tex-props-toggle" data-tip="Texture panel" data-i18n-tip="props_toggle_tip">
+                        <i class="fa-solid fa-sliders"></i>
+                    </button>
+                    <div id="tex-props-body" class="tex-props-body">
+                        <div class="tex-props-head">
+                            <span class="micro-label" data-i18n="props_title">Texture</span>
+                        </div>
+                        <div class="tex-props-preview">
+                            <img id="tex-props-thumb" alt="">
+                        </div>
+                        <div class="tex-props-meta">
+                            <div id="tex-props-name" class="mono" data-i18n="props_none">No texture</div>
+                            <div id="tex-props-sub" class="tex-props-sub"></div>
+                        </div>
+
+                        <span class="micro-label section" data-i18n="props_layer">Selected layer</span>
+                        <div id="tex-props-layer" class="tex-props-layer" data-i18n="props_layer_none">Nothing selected</div>
+
+                        <button id="tex-props-removebg" class="btn btn-ghost btn-block" disabled>
+                            <i class="fa-solid fa-eraser"></i>
+                            <span data-i18n="props_removebg">Remove background</span>
+                        </button>
+
+                        <div class="tex-props-adjust">
+                            <div class="opt-slider">
+                                <div class="opt-slider-head">
+                                    <span class="micro-label" data-i18n="props_brightness">Brightness</span>
+                                    <span id="adj-brightness-val" class="mono opt-val">100%</span>
+                                </div>
+                                <input type="range" id="adj-brightness" min="0" max="200" value="100" disabled>
+                            </div>
+                            <div class="opt-slider">
+                                <div class="opt-slider-head">
+                                    <span class="micro-label" data-i18n="props_saturation">Saturation</span>
+                                    <span id="adj-saturate-val" class="mono opt-val">100%</span>
+                                </div>
+                                <input type="range" id="adj-saturate" min="0" max="200" value="100" disabled>
+                            </div>
+                            <div class="opt-slider">
+                                <div class="opt-slider-head">
+                                    <span class="micro-label" data-i18n="props_contrast">Contrast</span>
+                                    <span id="adj-contrast-val" class="mono opt-val">100%</span>
+                                </div>
+                                <input type="range" id="adj-contrast" min="0" max="200" value="100" disabled>
+                            </div>
+                            <div class="tex-props-btns">
+                                <button id="adj-invert" class="btn btn-ghost" disabled data-tip="Invert colours" data-i18n-tip="props_invert">
+                                    <i class="fa-solid fa-circle-half-stroke"></i>
+                                </button>
+                                <button id="adj-reset" class="btn btn-ghost" disabled data-tip="Reset adjustments" data-i18n-tip="props_reset">
+                                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- ─── RIGHT DOCK ──────────────────────────────── -->
+        <aside id="dock">
+            <!-- SPINE — only the web studio's two console tabs -->
+            <div class="dock-tabs">
+                <button class="dock-tab" data-tab="ai">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span data-i18n="dock_ai">AI</span>
+                </button>
+                <button class="dock-tab active" data-tab="layers">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span data-i18n="dock_layers">Layers</span>
+                    <span class="tab-count mono" aria-hidden="true"></span>
+                </button>
+            </div>
+
+            <div class="dock-panes">
+
+                <!-- LAYERS — web console order: properties half on top,
+                     LAYERS zone bar + layer-ops keycaps, then the list -->
+                <div class="dock-pane active" data-pane="layers">
+                    <div id="inspector">
+                        <!-- selection inspector rendered by panels.js -->
+                        <div class="empty-state small">
+                            <i class="fa-solid fa-crosshairs"></i>
+                            <span data-i18n="inspector_empty">Select a layer to edit its properties</span>
+                        </div>
+                    </div>
+                    <div class="pane-head">
+                        <span class="micro-label" data-i18n="layers_title">Layers</span>
+                        <button id="btn-add-layer" class="btn-icon sm" data-tip="Add layer" data-i18n-tip="tip_add_layer"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div id="layer-ops" hidden>
+                        <button id="lop-up" class="btn-icon sm" data-tip="Move up" data-i18n-tip="tip_layer_up"><i class="fa-solid fa-chevron-up"></i></button>
+                        <button id="lop-down" class="btn-icon sm" data-tip="Move down" data-i18n-tip="tip_layer_down"><i class="fa-solid fa-chevron-down"></i></button>
+                        <button id="lop-dup" class="btn-icon sm" data-tip="Duplicate" data-i18n-tip="tip_duplicate"><i class="fa-regular fa-clone"></i></button>
+                        <button id="lop-del" class="btn-icon sm danger" data-tip="Delete" data-i18n-tip="tip_delete"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <div id="layer-list">
+                        <!-- .layer-row rendered by panels.js -->
+                        <div class="empty-state">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span data-i18n="layers_empty">No layers yet — pick a tool to start designing</span>
+                        </div>
+                    </div>
+                    <!-- snapshots — web studio has none; hidden via CSS but
+                         kept in the DOM (panels.js bindSnaps targets them) -->
+                    <div class="pane-head snap-head">
+                        <span class="micro-label" data-i18n="snaps_title">Saved textures</span>
+                        <button id="btn-snap-save" class="btn-icon sm" data-tip="Save current canvas" data-i18n-tip="tip_snap_save"><i class="fa-solid fa-camera"></i></button>
+                    </div>
+                    <div id="snap-grid" class="snap-grid">
+                        <div class="empty-state small">
+                            <i class="fa-regular fa-images"></i>
+                            <span data-i18n="snaps_empty">Save the canvas here and reuse it on any garment</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROJECTS -->
+                <div class="dock-pane" data-pane="projects">
+                    <div class="pane-scroll">
+                        <span class="micro-label section proj-mine-label" data-i18n="projects_mine">My Projects</span>
+                        <div id="projects-mine" class="project-grid">
+                            <!-- .project-card rendered by panels.js -->
+                            <div class="empty-state small">
+                                <i class="fa-regular fa-folder-open"></i>
+                                <span data-i18n="projects_empty">No projects saved yet</span>
+                            </div>
+                        </div>
+                        <span class="micro-label section proj-shared-label" data-i18n="projects_shared">Shared With Me</span>
+                        <div id="projects-shared" class="project-grid">
+                            <div class="empty-state small">
+                                <i class="fa-solid fa-share-nodes"></i>
+                                <span data-i18n="projects_shared_empty">Nothing shared with you yet</span>
+                            </div>
+                        </div>
+                        <div class="gallery-head">
+                            <span class="micro-label section" data-i18n="gallery_title">Community Gallery</span>
+                            <button id="btn-gallery-refresh" class="btn-icon sm" data-tip="Refresh gallery" data-i18n-tip="gallery_refresh"><i class="fa-solid fa-rotate"></i></button>
+                        </div>
+                        <div id="projects-gallery" class="project-grid">
+                            <div class="empty-state small">
+                                <i class="fa-solid fa-users"></i>
+                                <span data-i18n="gallery_empty">No public designs yet — publish one from "My Projects"</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pane-foot">
+                        <button id="btn-save-project" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span data-i18n="projects_save">Save Project</span>
+                        </button>
+                        <div class="code-row">
+                            <input id="input-share-code" class="input mono" type="text" maxlength="8"
+                                   placeholder="Share code" data-i18n-ph="projects_code_ph"
+                                   spellcheck="false" autocomplete="off">
+                            <button id="btn-import-code" class="btn btn-ghost">
+                                <i class="fa-solid fa-arrow-down-to-bracket"></i>
+                                <span data-i18n="projects_import">Import</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI — Quick AI console (web parity): prompt → generate →
+                     gear (settings + diagnostics) → generation history -->
+                <div class="dock-pane" data-pane="ai">
+                    <div class="pane-head">
+                        <span class="micro-label" data-i18n="ai_target_label">What to generate</span>
+                    </div>
+                    <!-- Two unrelated jobs live in this pane: making a
+                         texture, and asking for help. The switch shows one
+                         at a time. panels.js hides the Assistance side
+                         entirely when the server reports no key. -->
+                    <div id="ai-modes" class="ai-modes seg-group" role="tablist" hidden>
+                        <button class="seg-btn active" data-ai-mode="design" role="tab">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span data-i18n="ai_mode_design">Design</span>
+                        </button>
+                        <!-- hidden until the server says the assistant has a key -->
+                        <button id="btn-ai-mode-support" class="seg-btn" data-ai-mode="support" role="tab" hidden>
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span data-i18n="ai_mode_support">Assistance</span>
+                        </button>
+                    </div>
+
+                    <div class="pane-scroll">
+
+                      <div id="ai-mode-design">
+
+                        <!-- ENGINE — which image model runs. Filled by
+                             panels.js from the server's engine list, so an
+                             engine with no API key configured shows as
+                             unavailable instead of failing on use. -->
+                        <span class="micro-label section" data-i18n="ai_engine_label">Image engine</span>
+                        <div id="ai-engines" class="ai-engines" role="radiogroup"></div>
+
+                        <!-- TARGET — decides how the result lands on the
+                             canvas. panels.js keeps `ai-target` in sync with
+                             whether a marquee selection exists. -->
+                        <div id="ai-targets" class="ai-targets" role="radiogroup">
+                            <label class="ai-target">
+                                <input type="radio" name="ai-target" value="sheet" checked>
+                                <span class="ai-target-body">
+                                    <i class="fa-solid fa-car"></i>
+                                    <span class="ai-target-text">
+                                        <span class="ai-target-name" data-i18n="ai_t_sheet">Whole vehicle</span>
+                                        <span class="ai-target-desc" data-i18n="ai_t_sheet_desc">Restyles the full texture sheet, keeping the UV layout</span>
+                                    </span>
+                                </span>
+                            </label>
+                            <label class="ai-target" id="ai-target-selection">
+                                <input type="radio" name="ai-target" value="selection">
+                                <span class="ai-target-body">
+                                    <i class="fa-solid fa-vector-square"></i>
+                                    <span class="ai-target-text">
+                                        <span class="ai-target-name" data-i18n="ai_t_sel">Inside the selection</span>
+                                        <span class="ai-target-desc" data-i18n="ai_t_sel_desc">Only fills the region you marked with the Region tool</span>
+                                    </span>
+                                </span>
+                            </label>
+                            <label class="ai-target">
+                                <input type="radio" name="ai-target" value="image">
+                                <span class="ai-target-body">
+                                    <i class="fa-regular fa-image"></i>
+                                    <span class="ai-target-text">
+                                        <span class="ai-target-name" data-i18n="ai_t_img">Free image / logo</span>
+                                        <span class="ai-target-desc" data-i18n="ai_t_img_desc">A standalone PNG you can move, scale and download</span>
+                                    </span>
+                                </span>
+                            </label>
+                        </div>
+
+                        <span class="micro-label section" data-i18n="ai_prompt_label">Prompt</span>
+                        <textarea id="ai-prompt" class="input textarea" rows="4"
+                                  placeholder="Describe the texture you want to create…"
+                                  data-i18n-ph="ai_prompt_ph" spellcheck="false"></textarea>
+
+                        <!-- Prompt starters: one click appends a phrase.
+                             Filled by panels.js from the style banks that
+                             already power Quick AI Fit. Collapsible via the
+                             header toggle (state persists). -->
+                        <div class="ai-chips-head">
+                            <span class="micro-label section" data-i18n="ai_ideas_label">Prompt ideas</span>
+                            <button id="ai-chips-toggle" class="ai-chips-toggle" data-tip="Show / hide ideas" data-i18n-tip="ai_ideas_toggle">
+                                <span id="ai-chips-toggle-label" data-i18n="ai_ideas_hide">Hide</span>
+                                <i class="fa-solid fa-chevron-up"></i>
+                            </button>
+                        </div>
+                        <div id="ai-chips" class="ai-chips"></div>
+
+                        <div class="ai-run-row">
+                            <button id="btn-ai-generate" class="btn btn-primary">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span data-i18n="ai_generate">Generate</span>
+                            </button>
+                            <button id="btn-ai-surprise" class="btn btn-ghost" data-tip="Surprise me" data-i18n-tip="ai_surprise">
+                                <i class="fa-solid fa-dice"></i>
+                            </button>
+                        </div>
+                        <div id="ai-progress" class="ai-progress" hidden>
+                            <div class="ai-progress-bar"><span></span></div>
+                            <span id="ai-progress-label" class="mono" data-i18n="ai_generating">Generating…</span>
+                        </div>
+
+                        <details class="ai-settings">
+                            <summary>
+                                <i class="fa-solid fa-sliders"></i>
+                                <span data-i18n="ai_advanced">Advanced</span>
+                            </summary>
+                            <span class="micro-label section" data-i18n="ai_negative_label">Avoid (negative prompt)</span>
+                            <input id="ai-negative" class="input" type="text" spellcheck="false"
+                                   placeholder="text, watermark, human, mannequin"
+                                   data-i18n-ph="ai_negative_ph">
+                            <label class="check-row">
+                                <input type="checkbox" id="ai-reference-toggle">
+                                <span data-i18n="ai_reference">Use current canvas as reference</span>
+                            </label>
+                            <label class="check-row">
+                                <input type="checkbox" id="ai-fit-toggle" checked>
+                                <span data-i18n="ai_fit_uv">Fit to the garment texture (keeps the UV layout)</span>
+                            </label>
+                            <label class="check-row">
+                                <input type="checkbox" id="ai-seamless-toggle">
+                                <span data-i18n="ai_seamless">Ask for a seamless / tileable pattern</span>
+                            </label>
+                            <label class="check-row">
+                                <input type="checkbox" id="ai-transparent-toggle">
+                                <span data-i18n="ai_transparent">Cut the background out (logos &amp; graphics)</span>
+                            </label>
+                            <span class="micro-label section" data-i18n="ai_count_label">Variations per run</span>
+                            <select id="ai-count" class="input mono">
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                            <p class="pane-hint" data-i18n="ai_hint">Results are added to the canvas as a new image layer.</p>
+                            <div id="ai-meta" class="ai-meta mono"></div>
+                            <span class="micro-label section" data-i18n="ai_debug_label">Diagnostics</span>
+                            <div id="ai-debug" class="ai-debug mono">
+                                <div class="ai-debug-empty" data-i18n="ai_debug_empty">Every generation step is logged here.</div>
+                            </div>
+                        </details>
+
+                        <div class="gallery-head">
+                            <span class="micro-label section" data-i18n="ai_history_label">Recent Generations</span>
+                            <button id="btn-ai-clear" class="btn-icon sm" data-tip="Clear history" data-i18n-tip="ai_clear_tip"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <div id="ai-history">
+                            <!-- .ai-thumb rendered by panels.js -->
+                            <div class="empty-state small">
+                                <i class="fa-regular fa-image"></i>
+                                <span data-i18n="ai_history_empty">No generations yet</span>
+                            </div>
+                        </div>
+
+                      </div><!-- /#ai-mode-design -->
+
+                      <div id="ai-mode-support" hidden>
+
+                        <!-- ─── SUPPORT ASSISTANT ────────────────────
+                             Answers questions about the script itself.
+                             panels.js hides the whole block when the
+                             server reports no key / support disabled. -->
+                        <div id="support-block" hidden>
+                            <!-- No section label here: the pane head already
+                                 reads "Need help?" whenever this half is the
+                                 one showing. -->
+                            <!-- The transcript. aria-live so a screen reader
+                                 announces each answer as it lands; panels.js
+                                 rebuilds the whole list, never innerHTML with
+                                 model text. -->
+                            <div id="support-chat" class="support-chat" role="log" aria-live="polite"></div>
+
+                            <!-- Starter questions while the chat is empty,
+                                 one-tap follow-ups once it is not. -->
+                            <div id="support-quick" class="support-quick"></div>
+
+                            <div class="support-ask">
+                                <textarea id="support-input" class="input support-input" rows="1"
+                                          maxlength="400"
+                                          placeholder="How do I install my export?"
+                                          data-i18n-ph="support_ph"
+                                          spellcheck="false" autocomplete="off"></textarea>
+                                <button id="btn-support-send" class="btn btn-soft" data-tip="Ask"
+                                        data-i18n-tip="support_send">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </div>
+
+                            <div class="support-bar">
+                                <button id="btn-support-new" class="support-act" type="button" hidden>
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                    <span data-i18n="support_new">New chat</span>
+                                </button>
+                            </div>
+                        </div>
+
+                      </div><!-- /#ai-mode-support -->
+                    </div>
+                </div>
+
+                <!-- EXPORT -->
+                <div class="dock-pane" data-pane="export">
+                    <div class="pane-scroll">
+                        <span class="micro-label section" data-i18n="export_mode">Export Mode</span>
+                        <div class="mode-cards">
+                            <label class="mode-card">
+                                <input type="radio" name="export-mode" value="package" checked>
+                                <span class="mode-card-body">
+                                    <i class="fa-solid fa-box-archive"></i>
+                                    <span class="mode-card-text">
+                                        <span class="mode-name" data-i18n="export_package">Ready-to-use resource</span>
+                                        <span class="mode-desc" data-i18n="export_package_desc">A complete FiveM resource folder — just drop it in and ensure it</span>
+                                    </span>
+                                    <i class="fa-solid fa-circle-check mode-check"></i>
+                                </span>
+                            </label>
+                            <!-- The old "Full vehicle resource" card lived here.
+                                 It staged PNGs and then told you to go run
+                                 tools/build_vehicle.bat by hand with Node —
+                                 so the studio reported success while nothing
+                                 usable existed yet. The pack above is the
+                                 complete, self-contained deliverable. -->
+                            <label class="mode-card">
+                                <input type="radio" name="export-mode" value="live">
+                                <span class="mode-card-body">
+                                    <i class="fa-solid fa-tower-broadcast"></i>
+                                    <span class="mode-card-text">
+                                        <span class="mode-name" data-i18n="export_live">Live on Server</span>
+                                        <span class="mode-desc" data-i18n="export_live_desc">Applies instantly for everyone — no restart, and it persists</span>
+                                    </span>
+                                    <i class="fa-solid fa-circle-check mode-check"></i>
+                                </span>
+                            </label>
+                        </div>
+                        <!-- What each mode needs / produces, swapped per
+                             selection so the mode cards stay one line each -->
+                        <div id="export-mode-note" class="export-note"></div>
+
+                        <span class="micro-label section" data-i18n="export_name_label">Export Name</span>
+                        <input id="export-name" class="input mono" type="text" maxlength="40"
+                               placeholder="my_custom_shirt" data-i18n-ph="export_name_ph"
+                               spellcheck="false" autocomplete="off">
+
+                        <div class="export-head">
+                            <span class="micro-label section" data-i18n="export_summary_label">Textures</span>
+                            <label class="toggle-chip" data-tip="Include every texture you edited on this garment"
+                                   data-i18n-tip="export_all_tip">
+                                <input type="checkbox" id="export-all-toggle" checked>
+                                <span data-i18n="export_all">All edited</span>
+                            </label>
+                        </div>
+                        <!-- One checkable row per edited texture variant.
+                             Unchecking one leaves it out of this export. -->
+                        <div id="export-summary">
+                            <div class="empty-state small">
+                                <i class="fa-solid fa-car"></i>
+                                <span data-i18n="export_summary_empty">Nothing to export yet — design something first</span>
+                            </div>
+                        </div>
+
+                        <details class="ai-settings">
+                            <summary>
+                                <i class="fa-solid fa-sliders"></i>
+                                <span data-i18n="ai_advanced">Advanced</span>
+                            </summary>
+                            <span class="micro-label section" data-i18n="export_res_label">Output resolution</span>
+                            <select id="export-res" class="input mono">
+                                <option value="native" selected data-i18n="export_res_native">Native (same as the original)</option>
+                                <option value="2048">2048 × 2048</option>
+                                <option value="1024">1024 × 1024</option>
+                                <option value="512">512 × 512</option>
+                            </select>
+                            <label class="check-row">
+                                <input type="checkbox" id="export-download-toggle">
+                                <span data-i18n="export_download">Also download the PNGs to my PC</span>
+                            </label>
+                            <p class="pane-hint" data-i18n="export_res_hint">Native keeps the game's exact texture size — always the safest for a real .ytd.</p>
+                        </details>
+
+                        <div id="export-result" class="result-box mono" hidden></div>
+                    </div>
+                    <div class="pane-foot">
+                        <button id="btn-export-run" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-file-export"></i>
+                            <span data-i18n="export_run">Run Export</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+    </div>
+
+    <!-- ─── STATUSBAR ───────────────────────────────────── -->
+    <footer class="statusbar">
+        <div class="status-left">
+            <i class="fa-solid fa-circle-info"></i>
+            <span id="status-hint" data-i18n="status_ready">Ready</span>
+            <!-- shown only while a marquee region exists (panels.js) -->
+            <span id="sel-status" class="chip mono" hidden></span>
+        </div>
+        <div class="status-right">
+            <label class="status-size">
+                <span class="micro-label" data-i18n="status_size">Size</span>
+                <select id="canvas-size-select" class="mono">
+                    <option value="512">512</option>
+                    <option value="1024" selected>1024</option>
+                    <option value="2048">2048</option>
+                </select>
+            </label>
+            <span class="status-sep"></span>
+            <!-- No "live" class by default: nothing loaded ever cleared it,
+                 so the statusbar claimed a live preview even when the
+                 preview was off. -->
+            <span class="status-preview">
+                <span id="preview-status-dot"></span>
+                <span id="preview-status-label" data-i18n="preview_live">Live 3D preview</span>
+            </span>
+            <span class="status-sep"></span>
+            <span id="frame-time" class="mono">— ms</span>
+            <span class="status-sep"></span>
+            <span class="status-brand" data-i18n="status_brand">© Apex Scripts</span>
+        </div>
+    </footer>
+</div>
+
+<!-- ─── OVERLAY ROOTS ───────────────────────────────────── -->
+<div id="modal-root"><!-- .modal > .modal-card rendered by app.js --></div>
+<div id="toast-root" aria-live="polite"><!-- .toast rendered by app.js --></div>
+
+<!-- Hidden file pickers (image layer upload / UV guide import) -->
+<input type="file" id="file-image" accept="image/*" hidden>
+<input type="file" id="file-uv" accept="image/*" hidden>
+
+<!-- three.js for the isolated 3D garment viewer (loaded from CDN, like
+     the fonts/icons above — needs the client to have internet). r128
+     still ships the classic global GLTFLoader / OrbitControls builds. -->
+<!-- three.js r128 + its two example addons, vendored byte-for-byte from
+     the pinned unpkg URLs. These back the whole 3D viewer: loaded from a
+     CDN, a blocked or slow request left the studio with a dead viewer. -->
+<script src="vendor/three/three.min.js?v=116"></script>
+<script src="vendor/three/GLTFLoader.js?v=116"></script>
+<script src="vendor/three/OrbitControls.js?v=116"></script>
+
+<!-- ?v= busts FiveM's CEF cache — bump it whenever these files change -->
+<script src="js/app.js?v=116"></script>
+<script src="js/editor.js?v=116"></script>
+<script src="js/viewer.js?v=116"></script>
+<script src="js/panels.js?v=116"></script>
+<script src="js/wrap.js?v=116"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+{
+  "_comment": "Optional manual catalog. Normally left empty — tools/convert.js writes templates.json instead.",
+  "templates": []
+}

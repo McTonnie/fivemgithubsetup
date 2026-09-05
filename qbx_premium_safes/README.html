@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QBX Premium Safes - Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: #1a1a1a;
+            border-right: 1px solid #2a2a2a;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid #2a2a2a;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.3rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin: 0;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: #aaa;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+            background: #252525;
+            border-left-color: #4a9eff;
+        }
+
+        .nav-links a.active {
+            color: #4a9eff;
+            background: #1f2937;
+            border-left-color: #4a9eff;
+        }
+
+        /* Main Content */
+        .main {
+            margin-left: 280px;
+            flex: 1;
+            padding: 3rem;
+            max-width: 1000px;
+        }
+
+        section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #4a9eff;
+            padding-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: #fff;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: #4a9eff;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        h4 {
+            font-size: 1rem;
+            color: #88d3ff;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+            color: #ccc;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: #1a1a1a;
+            border-left: 3px solid #4a9eff;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            color: #88d3ff;
+        }
+
+        pre code {
+            color: #d4d4d4;
+        }
+
+        .code-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Feature Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-card {
+            background: #1a1a1a;
+            padding: 1.5rem;
+            border-left: 3px solid #4a9eff;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .feature-card:hover {
+            background: #252525;
+            transform: translateX(5px);
+        }
+
+        .feature-card h4 {
+            color: #4a9eff;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* Permission Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+        }
+
+        thead {
+            background: #252525;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        th {
+            color: #4a9eff;
+            font-weight: 600;
+        }
+
+        td {
+            color: #ccc;
+        }
+
+        tr:hover {
+            background: #1f2937;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: #1a2332;
+            border-left: 3px solid #4a9eff;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin: 1.5rem 0;
+        }
+
+        .info-box strong {
+            color: #4a9eff;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background: #2a1f1a;
+            border-left: 3px solid #f3b33d;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin: 1.5rem 0;
+        }
+
+        .warning-box strong {
+            color: #f3b33d;
+        }
+
+        /* Success Box */
+        .success-box {
+            background: #1a2a1f;
+            border-left: 3px solid #29c46d;
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin: 1.5rem 0;
+        }
+
+        .success-box strong {
+            color: #29c46d;
+        }
+
+        /* Step indicator */
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #4a9eff;
+            color: #fff;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 0.75rem;
+        }
+
+        .step-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid #2a2a2a;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>QBX Premium Safes</h1>
+                <p>Complete documentation & setup guide</p>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#overview" class="nav-link active">Overview</a></li>
+                    <li><a href="#installation" class="nav-link">Installation</a></li>
+                    <li><a href="#features" class="nav-link">Features</a></li>
+                    <li><a href="#upgrades" class="nav-link">Upgrades</a></li>
+                    <li><a href="#permissions" class="nav-link">Permissions</a></li>
+                    <li><a href="#persistence" class="nav-link">Safe Persistence</a></li>
+                    <li><a href="#alarm-system" class="nav-link">Alarm System</a></li>
+                    <li><a href="#break-in" class="nav-link">Break-In System</a></li>
+                    <li><a href="#weight-system" class="nav-link">Dynamic Weight</a></li>
+                    <li><a href="#config" class="nav-link">Configuration</a></li>
+                    <li><a href="#commands" class="nav-link">Commands</a></li>
+                    <li><a href="#webhooks" class="nav-link">Webhooks</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Overview -->
+            <section id="overview">
+                <h1>QBX Premium Safes</h1>
+                <p>Production-ready placeable safe system for QBox using <strong>ox_inventory</strong>, <strong>ox_lib</strong>, <strong>ox_target</strong>, <strong>oxmysql</strong>, and a modern NUI dashboard.</p>
+                
+                <p>A complete safe management solution with granular permissions, break-in mechanics, upgradeable storage, persistence system, audio-visual alarms, police dispatch integration, and full transaction logging.</p>
+
+                <h3>Key Highlights</h3>
+                <ul>
+                    <li>Place safes with custom names and prop models</li>
+                    <li>Granular permission system (deposit, withdraw, manage)</li>
+                    <li>5 purchasable upgrades (storage tiers, alarm, tracking, access control, owner online)</li>
+                    <li>8 storage tiers with progressive unlocking ($25K-$100K each)</li>
+                    <li>Dynamic item weight - safe gets heavier with each upgrade</li>
+                    <li>Audio-visual alarm system with map blips</li>
+                    <li>Police dispatch integration (origin_dispatch supported)</li>
+                    <li>Code breaker break-in mechanics with cooldowns and lockouts</li>
+                    <li>Safe persistence - pick up and place back with everything intact</li>
+                    <li>Full audit trail with Discord webhooks</li>
+                    <li>Modern NUI dashboard with tab permission gating</li>
+                </ul>
+            </section>
+
+            <!-- Installation -->
+            <section id="installation">
+                <h2>Installation Guide</h2>
+
+                <h3>Requirements</h3>
+                <ul>
+                    <li><code>qbx_core</code> - QBox framework core</li>
+                    <li><code>ox_inventory</code> - Item and inventory management</li>
+                    <li><code>ox_lib</code> - Utility library and UI components</li>
+                    <li><code>ox_target</code> - Third-eye interaction system</li>
+                    <li><code>oxmysql</code> - Database operations</li>
+                </ul>
+
+                <div class="warning-box">
+                    <strong>Important:</strong> Ensure all dependencies are running BEFORE starting qbx_premium_safes. Check your server.cfg load order.
+                </div>
+
+                <div class="step-title">
+                    <span class="step-number">1</span>
+                    <h3 style="margin: 0;">Download & Install</h3>
+                </div>
+                <ol>
+                    <li>Download the resource and place it in your <code>resources</code> folder</li>
+                    <li>Add <code>ensure qbx_premium_safes</code> to your <code>server.cfg</code> (after dependencies)</li>
+                </ol>
+
+                <div class="step-title">
+                    <span class="step-number">2</span>
+                    <h3 style="margin: 0;">Database Setup (Automatic)</h3>
+                </div>
+                <p>The schema is automatically created on first startup. No manual SQL import is needed. The system auto-creates these tables:</p>
+                <ul>
+                    <li><code>safes</code> - Safe records with upgrades, placement state, and ownership</li>
+                    <li><code>safe_access</code> - Member permission entries</li>
+                    <li><code>safe_logs</code> - Transaction history with actor tracking</li>
+                    <li><code>safe_contributions</code> - Member contribution tracking</li>
+                    <li><code>safe_tracked_items</code> - Per-safe tracking item configuration</li>
+                    <li><code>safe_tracker_progress</code> - Member progress tracking</li>
+                    <li><code>safe_tracker_archive</code> - Period archival data</li>
+                    <li><code>safe_crack_attempts</code> - Break-in attempt logs</li>
+                </ul>
+                <div class="success-box">
+                    <strong>Automatic Versioning:</strong> Future updates are applied automatically. The system tracks schema version and runs migrations as needed.
+                </div>
+
+                <div class="step-title">
+                    <span class="step-number">3</span>
+                    <h3 style="margin: 0;">Add Items to ox_inventory</h3>
+                </div>
+                <p>Add the following items to <code>ox_inventory/data/items.lua</code>:</p>
+                <div class="code-label">items.lua</div>
+                <pre><code>['placablesafe'] = {
+    label = 'Placeable Safe',
+    weight = 15000,
+    stack = false,
+    close = true,
+    description = 'A heavy secure safe. Place it to store your valuables.',
+    server = {
+        export = 'qbx_premium_safes.placablesafe'
+    }
+},
+
+['codecracker'] = {
+    label = 'Code Cracker',
+    weight = 2000,
+    stack = true,
+    close = true,
+    description = 'Electronic device used to attempt forced entry on secure safes.'
+},</code></pre>
+
+                <div class="info-box">
+                    <strong>Note:</strong> The <code>weight = 15000</code> (15kg) is the base weight. This will dynamically increase as upgrades are purchased. See the <a href="#weight-system">Dynamic Weight System</a> section.
+                </div>
+
+                <div class="step-title">
+                    <span class="step-number">4</span>
+                    <h3 style="margin: 0;">Copy Item Icons</h3>
+                </div>
+                <p>Copy the item icons from <code>item_Icons/</code> folder to your ox_inventory images folder:</p>
+                <ul>
+                    <li>Copy <code>placablesafe.png</code> and <code>codecracker.png</code></li>
+                    <li>Paste into <code>ox_inventory/web/images/</code></li>
+                </ul>
+
+                <div class="step-title">
+                    <span class="step-number">5</span>
+                    <h3 style="margin: 0;">Configure Dispatch (Optional)</h3>
+                </div>
+                <p>If you want police alerts on break-ins, configure the dispatch hook in <code>config.lua</code>:</p>
+                <div class="code-label">config.lua - Police Dispatch Hook</div>
+                <pre><code>Config.Hooks = {
+    policeAlert = function(payload)
+        exports['origin_dispatch']:SendDispatch({
+            job = 'police',
+            calls = 'Safe Break-In',
+            coords = payload.coords,
+            information = ('Break-in attempt at safe: %s'):format(payload.safeName or ('#' .. tostring(payload.safeId))),
+        })
+    end,
+    -- other hooks...
+}</code></pre>
+
+                <p>For other dispatch systems, modify the export call accordingly. The <code>payload</code> contains:</p>
+                <ul>
+                    <li><code>coords</code> - Safe location (vector3)</li>
+                    <li><code>safeName</code> - Name of the safe</li>
+                    <li><code>safeId</code> - Database ID</li>
+                    <li><code>playerName</code> - Name of the burglar (if available)</li>
+                </ul>
+
+                <div class="step-title">
+                    <span class="step-number">6</span>
+                    <h3 style="margin: 0;">Add Alarm Sound (Optional)</h3>
+                </div>
+                <p>The alarm system supports custom audio. Add your sound file:</p>
+                <ol>
+                    <li>Place a <code>.ogg</code> file in <code>web/sounds/</code> folder</li>
+                    <li>Update <code>Config.AlarmUpgrade.soundFile</code> with the filename (without .ogg extension)</li>
+                </ol>
+                <div class="code-label">config.lua</div>
+                <pre><code>Config.AlarmUpgrade = {
+    -- ...
+    soundFile = 'sound1', -- File: web/sounds/sound1.ogg
+    -- ...
+}</code></pre>
+
+                <div class="step-title">
+                    <span class="step-number">7</span>
+                    <h3 style="margin: 0;">Configure Webhooks (Optional)</h3>
+                </div>
+                <p>Add Discord webhook URLs for event logging:</p>
+                <div class="code-label">config.lua</div>
+                <pre><code>Config.Logging = {
+    resourcePrefix = '^5[qbx_premium_safes]^7',
+    webhooks = {
+        default = 'https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE',
+        crack = 'https://discord.com/api/webhooks/YOUR_CRACK_WEBHOOK',
+        admin = 'https://discord.com/api/webhooks/YOUR_ADMIN_WEBHOOK',
+    }
+}</code></pre>
+
+                <div class="success-box">
+                    <strong>Installation Complete!</strong> Restart your server or use <code>refresh</code> then <code>ensure qbx_premium_safes</code> in the console.
+                </div>
+            </section>
+
+            <!-- Features -->
+            <section id="features">
+                <h2>Features</h2>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h4>Placement & Ownership</h4>
+                        <p>Place safes with unique names and automatic ownership tracking. Custom prop support with display names.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Permission System</h4>
+                        <p>Granular per-member access control: deposit, withdraw, and manage permissions. Add offline players by citizen ID.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Manager Role</h4>
+                        <p>Players with "manage" permission can edit members and purchase upgrades - not just the owner.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Storage Tiers</h4>
+                        <p>8 upgradeable tiers with increasing capacity. Progressively unlock more slots (40→120) and weight (250kg→3000kg).</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Access Control Upgrade</h4>
+                        <p>Purchasable upgrade to restrict stash access. Without it, anyone can access the safe. Hides Access tab until purchased.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Audio-Visual Alarm</h4>
+                        <p>Flashing UI alert with safe name, custom .ogg sound, and map blip at break-in location.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Police Dispatch</h4>
+                        <p>Automatic police alerts on break-in attempts. Supports origin_dispatch out of the box.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Owner Online Requirement</h4>
+                        <p>Purchasable upgrade that prevents break-ins when the safe owner is offline.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Member Tracking</h4>
+                        <p>Monitor contributions and member activity. Purchasable tracking upgrade unlocks Tracking tab.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Safe Persistence</h4>
+                        <p>Pick up safes with all items and upgrades intact. Place back down and everything is restored. Ownership transfers to placer.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Dynamic Weight</h4>
+                        <p>Safe item weight increases with each upgrade purchased. Configurable base weight and max cap.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Break-In System</h4>
+                        <p>Crack safes using code crackers. Configurable success chance, cooldowns, lockout timers.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Direct Stash Access</h4>
+                        <p>Use ox_target to open stash directly. Respects deposit/withdraw permissions. Withdrawal blocked for deposit-only users.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Unknown Actor Masking</h4>
+                        <p>Break-ins via code cracker log transactions as "Unknown" to maintain anonymity.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Full Logging</h4>
+                        <p>Complete audit trail of all transactions with Discord webhook support.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>UI Sound Toggle</h4>
+                        <p>Players can toggle alarm sounds on/off via settings. Preference persists in localStorage.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upgrades -->
+            <section id="upgrades">
+                <h2>Purchasable Upgrades</h2>
+
+                <p>All upgrades are purchased through the NUI dashboard and persist with the safe. Players with "manage" permission can purchase upgrades.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Upgrade</th>
+                            <th>Price</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Storage Tiers</strong></td>
+                            <td>$25K - $100K</td>
+                            <td>8 tiers increasing slots (40→120) and weight (250kg→3000kg). Must be purchased in order. Tiers 1-3: $25K each. Tiers 4-8: $100K each.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Access Control</strong></td>
+                            <td>$25,000</td>
+                            <td>Restricts stash access to allowed users only. Without this upgrade, anyone can access the stash. Access tab hidden until purchased.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Silent Alarm</strong></td>
+                            <td>$35,000</td>
+                            <td>Triggers audio-visual alert on break-in. Shows safe name in notification. Creates map blip at safe location. Alerts police via dispatch.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Owner Online</strong></td>
+                            <td>$40,000</td>
+                            <td>Prevents break-ins when the safe owner is offline. Burglars will be notified the owner is unavailable.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Member Tracking</strong></td>
+                            <td>$30,000</td>
+                            <td>Enables member contribution tracking and progress goals. Unlocks Tracking tab in UI.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box">
+                    <strong>Tip:</strong> The Access tab is only visible when the Access Control upgrade is owned. The Tracking tab is only visible when the Tracking upgrade is owned. Settings tab is only visible to players with "manage" permission.
+                </div>
+            </section>
+
+            <!-- Permissions -->
+            <section id="permissions">
+                <h2>Permissions Breakdown</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Deposit</th>
+                            <th>Withdraw</th>
+                            <th>Manage</th>
+                            <th>Capabilities</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Owner</strong></td>
+                            <td>✓</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                            <td>Full control, edit members, purchase upgrades, pickup safe, transfer ownership on placement</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Manager</strong></td>
+                            <td>✓</td>
+                            <td>✓</td>
+                            <td>✓</td>
+                            <td>Edit member permissions, purchase upgrades, view Access/Settings tabs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Withdraw</strong></td>
+                            <td>✓</td>
+                            <td>✓</td>
+                            <td>-</td>
+                            <td>Can deposit and withdraw items</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Deposit Only</strong></td>
+                            <td>✓</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>Can only add items to safe. Withdrawal is blocked via inventory hooks.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Access Control Behavior</h3>
+                <ul>
+                    <li><strong>With Access Control Upgrade:</strong> Only users with explicit permissions can access the stash</li>
+                    <li><strong>Without Access Control Upgrade:</strong> Anyone can access and interact with the stash</li>
+                    <li><strong>Withdrawal Blocking:</strong> Deposit-only users cannot withdraw items even with direct stash access</li>
+                </ul>
+
+                <h3>Permission Actions</h3>
+                <ul>
+                    <li><strong>Withdraw Permission:</strong> Allows taking items from the safe</li>
+                    <li><strong>Deposit Permission:</strong> Allows adding items to the safe</li>
+                    <li><strong>Manage Permission:</strong> Allows editing member permissions, purchasing upgrades, and viewing Access/Settings tabs</li>
+                </ul>
+
+                <h3>Adding Offline Players</h3>
+                <p>You can add players to safe access even if they're offline by entering their Citizen ID manually in the access management UI.</p>
+            </section>
+
+            <!-- Safe Persistence -->
+            <section id="persistence">
+                <h2>Safe Persistence System</h2>
+
+                <p>Safes maintain their complete state when picked up and placed back down, including all items and upgrades.</p>
+
+                <h3>How It Works</h3>
+                <ul>
+                    <li><strong>Pickup:</strong> When an owner picks up a safe, the database record is marked as <code>is_placed = 0</code> but NOT deleted</li>
+                    <li><strong>Item Metadata:</strong> The safe item stores the Safe ID and safe name in its metadata</li>
+                    <li><strong>Dynamic Weight:</strong> The item weight is recalculated based on purchased upgrades</li>
+                    <li><strong>Placement:</strong> When placed back down, the system detects the Safe ID and relinks to the existing database record</li>
+                    <li><strong>Ownership Transfer:</strong> The player who places the safe becomes the new owner (coordinates, name, and owner all update)</li>
+                </ul>
+
+                <h3>What Persists</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <h4>All Items</h4>
+                        <p>Every item in the stash remains intact through pickup/placement.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Storage Tier</h4>
+                        <p>Purchased storage upgrades are preserved.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>All Upgrades</h4>
+                        <p>Alarm, Tracking, Access Control, Owner Online - all preserved.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Access List</h4>
+                        <p>All member permissions remain configured.</p>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <strong>Important:</strong> Only the owner can pick up a safe. When placed by a different player, ownership transfers to that player automatically.
+                </div>
+            </section>
+
+            <!-- Alarm System -->
+            <section id="alarm-system">
+                <h2>Alarm System</h2>
+
+                <p>The Silent Alarm upgrade provides comprehensive break-in detection with multiple notification channels.</p>
+
+                <h3>Notification Channels</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Channel</th>
+                            <th>Trigger</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Owner Alert</strong></td>
+                            <td>Break-in attempt starts</td>
+                            <td>NUI popup with safe name, flashing animation, and audio</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Map Blip</strong></td>
+                            <td>Break-in attempt starts</td>
+                            <td>Red flashing blip at safe location. Duration configurable (default: 30 seconds)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Police Dispatch</strong></td>
+                            <td>Break-in attempt starts</td>
+                            <td>Alert sent to police via configured dispatch system</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Alarm Configuration</h3>
+                <div class="code-label">config.lua</div>
+                <pre><code>Config.AlarmUpgrade = {
+    enabled = true,
+    label = 'Silent Alarm',
+    currency = 'cash',
+    price = 35000,
+    notifyOwner = true,
+    notifyMessage = 'Your safe alarm has been triggered...',
+    blipSeconds = 30,              -- Map blip duration
+    soundFile = 'sound1',          -- .ogg file in web/sounds/
+    visualEffect = {
+        enabled = true,
+        duration = 9000,           -- UI alert duration (ms)
+        title = 'SAFE UNDER ATTACK',
+        subtitle = 'Break-in attempt detected',
+        pulseCount = 3,
+    }
+}</code></pre>
+
+                <h3>Sound Toggle</h3>
+                <p>Players can disable alarm sounds via the Settings tab in the NUI menu. This preference is stored in browser localStorage and persists across sessions.</p>
+            </section>
+
+            <!-- Break-In System -->
+            <section id="break-in">
+                <h2>Break-In System</h2>
+
+                <p>Safes can be broken into using the Code Cracker item. The system supports configurable difficulty and security measures.</p>
+
+                <h3>Break-In Flow</h3>
+                <ol>
+                    <li>Player uses Code Cracker on a placed safe</li>
+                    <li>System checks: owner online requirement, cooldown, lockout status</li>
+                    <li>Progress bar displays crack duration</li>
+                    <li>Success/failure determined by configured chance</li>
+                    <li>If alarm owned: owner notified, police dispatched, blip created</li>
+                    <li>If successful: temporary withdraw access granted</li>
+                    <li>If failed: lockout timer starts</li>
+                </ol>
+
+                <h3>Configuration</h3>
+                <div class="code-label">config.lua</div>
+                <pre><code>Config.Cracking = {
+    cooldownSeconds = 300,        -- 5 minutes between attempts
+    crackDuration = 180000,       -- 3 minutes to crack
+    successChance = 50,           -- 50% success rate
+    failedLockoutSeconds = 180,   -- 3 minute lockout on failure
+    allowedGroups = {},           -- Empty = anyone can attempt
+    anyoneCanAttempt = true,
+    grantsTemporaryWithdrawAccess = true,
+    createRaidSession = false,
+}</code></pre>
+
+                <h3>Owner Online Requirement</h3>
+                <p>When this upgrade is owned, break-ins are blocked if the safe owner is offline. The burglar receives a notification: <em>"The safe owner is not online. Break-in not possible."</em></p>
+
+                <h3>Unknown Actor Masking</h3>
+                <p>When a safe is accessed via code cracker, all transactions are logged with actor name as <strong>"Unknown"</strong>. This maintains anonymity for the burglar.</p>
+            </section>
+
+            <!-- Weight System -->
+            <section id="weight-system">
+                <h2>Dynamic Weight System</h2>
+
+                <p>Safe items dynamically increase in weight based on purchased upgrades, making upgraded safes heavier to carry.</p>
+
+                <h3>How It Works</h3>
+                <ul>
+                    <li><strong>Base Weight:</strong> 15kg (configurable)</li>
+                    <li><strong>Weight Per Upgrade:</strong> 5kg added for each upgrade owned</li>
+                    <li><strong>Maximum Cap:</strong> 50kg - weight cannot exceed this limit</li>
+                </ul>
+
+                <h3>Upgrades That Add Weight</h3>
+                <ul>
+                    <li>Storage Tier (each tier above 1 adds weight)</li>
+                    <li>Alarm Upgrade</li>
+                    <li>Owner Online Requirement</li>
+                    <li>Tracking Upgrade</li>
+                    <li>Access Control Upgrade</li>
+                </ul>
+
+                <h3>Example Calculation</h3>
+                <p>A safe with Tier 3 storage + Alarm + Tracking:</p>
+                <pre><code>Base: 15kg
++ Tier 3 (2 tiers above 1): +10kg
++ Alarm: +5kg
++ Tracking: +5kg
+= 35kg total</code></pre>
+
+                <h3>Configuration</h3>
+                <div class="code-label">config.lua</div>
+                <pre><code>Config.Safes = {
+    -- ...
+    baseWeight = 15000,           -- 15kg base (must match ox_inventory item weight)
+    weightPerUpgrade = 5000,      -- 5kg per upgrade
+    maxItemWeight = 50000,        -- 50kg maximum
+}</code></pre>
+
+                <div class="info-box">
+                    <strong>Important:</strong> The <code>baseWeight</code> in config.lua should match the <code>weight</code> defined in your ox_inventory <code>items.lua</code> to prevent stacking issues.
+                </div>
+            </section>
+
+            <!-- Configuration -->
+            <section id="config">
+                <h2>Configuration</h2>
+
+                <h3>Safe Settings</h3>
+                <div class="code-label">config.lua</div>
+                <pre><code>Config.Safes = {
+    props = {
+        { prop = `prop_ld_int_safe_01`, displayname = 'Steel Safe' },
+        { prop = `p_v_43_safe_s`, displayname = 'Wall Safe' },
+    },
+    defaultProp = `prop_ld_int_safe_01`,
+    interactionDistance = 2.0,
+    stash = {
+        slots = 20,
+        maxWeight = 100000,        -- 100kg
+        labelPrefix = 'Secure Safe',
+    },
+    itemSelector = {
+        slots = 5,
+        maxWeight = 25000,         -- 25kg
+    },
+    targetZone = {
+        size = vec3(1.2, 1.2, 1.8),
+        drawSprite = false,
+        debug = false,
+    },
+    baseWeight = 15000,
+    weightPerUpgrade = 5000,
+    maxItemWeight = 50000,
+}</code></pre>
+
+                <h3>Storage Tiers</h3>
+                <div class="code-label">config.lua</div>
+                <pre><code>Config.StorageTiers = {
+    currency = 'cash',
+    tiers = {
+        [1] = { label = 'Tier 1', price = 25000, slots = 40, maxWeight = 250000 },
+        [2] = { label = 'Tier 2', price = 25000, slots = 70, maxWeight = 500000 },
+        [3] = { label = 'Tier 3', price = 25000, slots = 90, maxWeight = 750000 },
+        [4] = { label = 'Tier 4', price = 100000, slots = 120, maxWeight = 1000000 },
+        [5] = { label = 'Tier 5', price = 100000, slots = 120, maxWeight = 1500000 },
+        [6] = { label = 'Tier 6', price = 100000, slots = 120, maxWeight = 2000000 },
+        [7] = { label = 'Tier 7', price = 100000, slots = 120, maxWeight = 2500000 },
+        [8] = { label = 'Tier 8', price = 100000, slots = 120, maxWeight = 3000000 },
+    }
+}</code></pre>
+
+                <h3>Upgrade Prices</h3>
+                <div class="code-label">config.lua</div>
+                <pre><code>Config.AccessUpgrade = { price = 25000, currency = 'cash', ... }
+Config.AlarmUpgrade = { price = 35000, currency = 'cash', ... }
+Config.OwnerOnlineRequirement = { price = 40000, currency = 'cash', ... }
+Config.TrackingUpgrade = { price = 30000, currency = 'cash', ... }</code></pre>
+
+                <h3>Theme Customization</h3>
+                <p>The NUI dashboard supports full theme customization via CSS tokens:</p>
+                <div class="code-label">config.lua</div>
+                <pre><code>Config.Theme = {
+    name = 'midnight',
+    tokens = {
+        primary = '#7c5cff',
+        secondary = '#1c2333',
+        accent = '#19c2ff',
+        background = 'rgba(8, 11, 19, 0.88)',
+        -- ... more tokens available
+    }
+}</code></pre>
+            </section>
+
+            <!-- Commands -->
+            <section id="commands">
+                <h2>Commands</h2>
+
+                <h3>Player Commands</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Command</th>
+                            <th>Description</th>
+                            <th>Permission</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>/placesafe [name]</code></td>
+                            <td>Place a new safe at your location</td>
+                            <td>Requires safe item in inventory</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Admin Commands</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Command</th>
+                            <th>Description</th>
+                            <th>Permission</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>/safeinspect</code></td>
+                            <td>Inspect nearest safe within 5.0 range</td>
+                            <td>Admin groups (god, admin)</td>
+                        </tr>
+                        <tr>
+                            <td><code>/safecleanup</code></td>
+                            <td>Remove empty safes from database</td>
+                            <td>Admin groups</td>
+                        </tr>
+                        <tr>
+                            <td><code>/saferesetprogress</code></td>
+                            <td>Reset safe contribution tracking</td>
+                            <td>Admin groups</td>
+                        </tr>
+                        <tr>
+                            <td><code>/safeclearforced</code></td>
+                            <td>Clear forced access state</td>
+                            <td>Admin groups</td>
+                        </tr>
+                        <tr>
+                            <td><code>/safeforceremove [id]</code></td>
+                            <td>Force remove a safe by ID</td>
+                            <td>Admin groups</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Server Console Only</h3>
+                <div class="warning-box">
+                    <strong>Danger:</strong> This command permanently deletes ALL safes and cannot be undone.
+                    <pre><code>deleteallsafes confirm</code></pre>
+                    <p>Executes from server TX console only. Wipes all safe-related tables.</p>
+                </div>
+
+                <h3>Command Configuration</h3>
+                <div class="code-label">config.lua</div>
+                <pre><code>Config.Commands = {
+    inspect = 'safeinspect',
+    cleanup = 'safecleanup',
+    reset = 'saferesetprogress',
+    clearCrack = 'safeclearforced',
+    forceRemove = 'safeforceremove',
+}</code></pre>
+            </section>
+
+            <!-- Webhooks -->
+            <section id="webhooks">
+                <h2>Webhooks & Discord Integration</h2>
+
+                <h3>Webhook Events</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Webhook</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Safe Placed</td>
+                            <td>default</td>
+                            <td>Logs creation with owner info and location</td>
+                        </tr>
+                        <tr>
+                            <td>Safe Removed</td>
+                            <td>default</td>
+                            <td>Logs deletion with item count</td>
+                        </tr>
+                        <tr>
+                            <td>Item Transaction</td>
+                            <td>default</td>
+                            <td>Logs all deposits and withdrawals with actor name</td>
+                        </tr>
+                        <tr>
+                            <td>Safe Cracked</td>
+                            <td>crack</td>
+                            <td>Alerts on break-in attempts</td>
+                        </tr>
+                        <tr>
+                            <td>Upgrade Purchased</td>
+                            <td>default</td>
+                            <td>Logs all upgrade purchases with price</td>
+                        </tr>
+                        <tr>
+                            <td>Admin Action</td>
+                            <td>admin</td>
+                            <td>Logs admin commands and force removals</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Transaction Masking</h3>
+                <p>When a safe is accessed via code cracker, the actor is logged as <strong>"Unknown"</strong> to maintain anonymity during break-ins.</p>
+
+                <h3>Configuration</h3>
+                <div class="code-label">config.lua</div>
+                <pre><code>Config.Logging = {
+    resourcePrefix = '^5[qbx_premium_safes]^7',
+    webhooks = {
+        default = '',              -- Main webhook URL
+        crack = '',                -- Break-in alerts
+        admin = '',                -- Admin actions
+    }
+}</code></pre>
+
+                <div class="info-box">
+                    <strong>Setup:</strong> Add your Discord webhook URLs to enable automatic event logging. Leave empty to disable specific webhooks.
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <section style="border-top: 1px solid #2a2a2a; padding-top: 2rem; margin-top: 4rem;">
+                <p style="color: #666; font-size: 0.9rem;">
+                    <strong>QBX Premium Safes</strong> by McTonnie<br>
+                    Built for QBox Framework with ox_lib, ox_inventory, and ox_target.
+                </p>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Smooth navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                const target = this.getAttribute('href');
+                const section = document.querySelector(target);
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Update active nav on scroll
+        window.addEventListener('scroll', () => {
+            let current = '';
+            document.querySelectorAll('section').forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

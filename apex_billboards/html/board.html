@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>apex_billboards — board surface</title>
+<style>
+    /* The page IS the billboard texture. Whatever renders here is
+       projected onto the traced surface by the scaleform. The body
+       stays transparent so masked shapes (circle / polygon) keep the
+       wall visible outside the mask. */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: transparent; }
+
+    /* #fit maps the virtual board space (physical aspect) onto the DUI
+       canvas — content inside never distorts even though the canvas
+       aspect is fixed. Sized/scaled from JS. */
+    #fit { position: absolute; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; }
+
+    /* #strip is the full (uncropped) content box. Wrap faces shift it
+       horizontally so each wall shows its slice. */
+    #strip { position: absolute; top: 0; height: 100%; }
+
+    /* Opaque backdrop BEHIND the content. Without it the wall shows
+       through whenever the content does not cover every pixel: during a
+       playlist crossfade, while an image is still loading, in fit mode,
+       or under a transparent PNG. Switched off by the "transparent"
+       content flag for boards that WANT the wall to show. */
+    #bg { position: absolute; inset: 0; background: #000; }
+
+    /* Crossfade: the incoming layer is stacked ON TOP and fades in while
+       the outgoing one stays fully opaque underneath. Fading both at once
+       (the obvious way) drops the combined alpha below 1 mid-transition,
+       which is exactly how the background leaked through. */
+    .layer { position: absolute; inset: 0; opacity: 0; transition: opacity .8s ease; }
+    .layer.on { opacity: 1; }
+    .layer .box { position: absolute; inset: 0; overflow: hidden; }
+    .layer img, .layer video, .layer iframe { position: absolute; }
+    /* YouTube embeds are sized/cropped from JS; never let the player's
+       own UI catch a click (there is no cursor on a billboard anyway). */
+    .layer iframe { border: 0; pointer-events: none; }
+
+    /* ─── Placeholder (no content yet) ─────────────────────── */
+    #ph {
+        position: absolute; inset: 0; display: none;
+        align-items: center; justify-content: center; flex-direction: column;
+        gap: 4%; overflow: hidden;
+        background: linear-gradient(135deg, #07080C 0%, #0D1220 45%, #07080C 100%);
+        font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+    }
+    #ph::before {
+        content: ''; position: absolute; inset: -60%;
+        background: conic-gradient(from 0deg,
+            transparent 0deg, var(--brand, #1F5EFF) 40deg, transparent 90deg,
+            transparent 180deg, var(--brand2, #5C7AFF) 220deg, transparent 270deg);
+        opacity: .16; animation: phSpin 14s linear infinite;
+    }
+    @keyframes phSpin { to { transform: rotate(360deg); } }
+    #ph .mark {
+        position: relative; display: flex; align-items: center; gap: .5em;
+        font-weight: 800; letter-spacing: .34em; color: #F4F4F5;
+        font-size: 64px; text-transform: uppercase;
+    }
+    #ph .mark i {
+        width: 1.05em; height: 1.05em; border-radius: .24em; font-style: normal;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, var(--brand, #1F5EFF), #2563eb);
+        font-size: .78em; letter-spacing: 0; color: #fff;
+    }
+    #ph .sub {
+        position: relative; font-size: 26px; font-weight: 600;
+        letter-spacing: .18em; text-transform: uppercase; color: #A8A8AD;
+    }
+    #ph .line {
+        position: relative; width: 34%; height: 3px; border-radius: 3px;
+        background: linear-gradient(90deg, transparent, var(--brand, #1F5EFF), transparent);
+        animation: phPulse 2.6s ease-in-out infinite;
+    }
+    @keyframes phPulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+
+    /* ─── Content animations ───────────────────────────────── */
+    .anim-kenburns { animation: kenburns var(--dur, 22s) ease-in-out infinite alternate; }
+    @keyframes kenburns {
+        from { transform: scale(1.02) translate(-1.2%, -0.8%); }
+        to   { transform: scale(1.16) translate(1.4%, 1.0%); }
+    }
+    .anim-zoom { animation: slowzoom var(--dur, 16s) ease-in-out infinite alternate; }
+    @keyframes slowzoom { from { transform: scale(1); } to { transform: scale(1.12); } }
+    .anim-pan { animation: slowpan var(--dur, 18s) ease-in-out infinite alternate; }
+    @keyframes slowpan { from { transform: translateX(-2.5%) scale(1.08); } to { transform: translateX(2.5%) scale(1.08); } }
+    .anim-fade { animation: fade var(--dur, 6s) ease-in-out infinite; }
+    @keyframes fade { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+    .anim-pulse { animation: pulse var(--dur, 3.2s) ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+    .anim-sway { animation: sway var(--dur, 7s) ease-in-out infinite alternate; }
+    @keyframes sway { from { transform: rotate(-1.1deg) scale(1.06); } to { transform: rotate(1.1deg) scale(1.06); } }
+
+    /* Carousel strip moves via JS-driven transitions */
+    .car { transition-property: transform; transition-timing-function: cubic-bezier(.65,.05,.36,1); }
+    .car.linear { transition-timing-function: linear; }
+
+    body.eco .layer *, body.eco #ph::before, body.eco #ph .line {
+        animation-play-state: paused !important;
+        transition: none !important;
+    }
+</style>
+</head>
+<body>
+    <div id="fit">
+        <div id="bg"></div>
+        <div id="strip">
+            <div id="layerA" class="layer"></div>
+            <div id="layerB" class="layer"></div>
+        </div>
+        <div id="ph">
+            <div class="mark"><i>◢</i>APEX</div>
+            <div class="line"></div>
+            <div class="sub">Billboards · Available Space</div>
+        </div>
+    </div>
+    <script src="js/board.js"></script>
+</body>
+</html>

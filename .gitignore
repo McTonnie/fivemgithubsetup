@@ -1,0 +1,15 @@
+﻿# OS junk
+Thumbs.db
+.DS_Store
+
+# editor
+.vscode/
+.idea/
+
+# logs / runtime junk
+*.log
+cache/
+
+# local secrets, never commit these
+*.secrets.lua
+.env

@@ -1,0 +1,8 @@
+This file exists so the folder survives a zip.
+
+The server writes here at runtime. It must NOT create the folder itself:
+os.createdir followed by a write into the new directory hard-killed the
+FXServer process on Linux twice in a sibling resource, and a pcall does
+not catch a native fault. Shipping the folder removes the need entirely.
+
+Do not delete this file.

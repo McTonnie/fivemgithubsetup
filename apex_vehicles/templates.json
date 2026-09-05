@@ -1,0 +1,369 @@
+{
+  "_comment": "Auto-updated by tools/convert.js. The NUI fetches this directly. Safe to edit by hand.",
+  "templates": [
+    {
+      "glb": "stream/models/vehicles/rrvigeroclassic.glb",
+      "textures": [
+        {
+          "id": "a",
+          "txn": "ss69_sign_1",
+          "png": "stream/models/vehicles/rrvigeroclassic__ss69_sign_1.png",
+          "w": 64,
+          "h": 64,
+          "label": "Ss69 Sign 1"
+        },
+        {
+          "id": "b",
+          "txn": "tails",
+          "png": "stream/models/vehicles/rrvigeroclassic__tails.png",
+          "w": 1024,
+          "h": 1024,
+          "label": "Tails"
+        },
+        {
+          "id": "c",
+          "txn": "lp_02_albedo",
+          "png": "stream/models/vehicles/rrvigeroclassic__lp_02_albedo.png",
+          "w": 1024,
+          "h": 1024,
+          "label": "Lp 02 Albedo"
+        },
+        {
+          "id": "d",
+          "txn": "lp_02_albedo_02",
+          "png": "stream/models/vehicles/rrvigeroclassic__lp_02_albedo_02.png",
+          "w": 1024,
+          "h": 1024,
+          "label": "Lp 02 Albedo 02"
+        },
+        {
+          "id": "e",
+          "txn": "Fuel_Pressure",
+          "png": "stream/models/vehicles/rrvigeroclassic__fuel_pressure.png",
+          "w": 1024,
+          "h": 1024,
+          "label": "Fuel Pressure"
+        },
+        {
+          "id": "f",
+          "txn": "script_rt_dials_race",
+          "png": "stream/models/vehicles/rrvigeroclassic__script_rt_dials_race.png",
+          "w": 1024,
+          "h": 512,
+          "label": "Script Rt Dials Race"
+        },
+        {
+          "id": "g",
+          "txn": "vehicle_generic_doorshut",
+          "png": "stream/models/vehicles/rrvigeroclassic__vehicle_generic_doorshut.png",
+          "w": 1024,
+          "h": 512,
+          "label": "Vehicle Generic Doorshut"
+        },
+        {
+          "id": "h",
+          "txn": "che_camaross_69_symbols_001_diff",
+          "png": "stream/models/vehicles/rrvigeroclassic__che_camaross_69_symbols_001_diff.png",
+          "w": 512,
+          "h": 512,
+          "label": "Che Camaross 69 Symbols 001 Diff"
+        },
+        {
+          "id": "i",
+          "txn": "CHE_camaross_69_gauges_DIFF",
+          "png": "stream/models/vehicles/rrvigeroclassic__che_camaross_69_gauges_diff.png",
+          "w": 512,
+          "h": 512,
+          "label": "CHE Camaross 69 Gauges DIFF"
+        },
+        {
+          "id": "j",
+          "txn": "tail_emis",
+          "png": "stream/models/vehicles/rrvigeroclassic__tail_emis.png",
+          "w": 512,
+          "h": 512,
+          "label": "Tail Emis"
+        },
+        {
+          "id": "k",
+          "txn": "che_777_corvettefd_13_symbols_embossed_diff_624b6659-4007-4aaa-ab25-073155870efb",
+          "png": "stream/models/vehicles/rrvigeroclassic__che_777_corvettefd_13_symbols_embossed_diff_624b6659-4007-4aaa-ab25-073155870efb.png",
+          "w": 512,
+          "h": 512,
+          "label": "Che 777 Corvettefd 13 Symbols Embossed Diff 624b6659 4007 4aaa Ab25 073155870efb"
+        },
+        {
+          "id": "l",
+          "txn": "palette",
+          "png": "stream/models/vehicles/rrvigeroclassic__palette.png",
+          "w": 512,
+          "h": 512,
+          "label": "Palette"
+        },
+        {
+          "id": "m",
+          "txn": "carbon_base_color",
+          "png": "stream/models/vehicles/rrvigeroclassic__carbon_base_color.png",
+          "w": 512,
+          "h": 512,
+          "label": "Carbon Base Color"
+        },
+        {
+          "id": "n",
+          "txn": "che_emblem_038_diff",
+          "png": "stream/models/vehicles/rrvigeroclassic__che_emblem_038_diff.png",
+          "w": 512,
+          "h": 256,
+          "label": "Che Emblem 038 Diff"
+        },
+        {
+          "id": "o",
+          "txn": "gls_ridges_107",
+          "png": "stream/models/vehicles/rrvigeroclassic__gls_ridges_107.png",
+          "w": 512,
+          "h": 256,
+          "label": "Gls Ridges 107"
+        },
+        {
+          "id": "p",
+          "txn": "bbclogo",
+          "png": "stream/models/vehicles/rrvigeroclassic__bbclogo.png",
+          "w": 1024,
+          "h": 128,
+          "label": "Bbclogo"
+        },
+        {
+          "id": "q",
+          "txn": "mesh",
+          "png": "stream/models/vehicles/rrvigeroclassic__mesh.png",
+          "w": 256,
+          "h": 256,
+          "label": "Mesh"
+        },
+        {
+          "id": "r",
+          "txn": "Leather_0",
+          "png": "stream/models/vehicles/rrvigeroclassic__leather_0.png",
+          "w": 256,
+          "h": 256,
+          "label": "Leather 0"
+        },
+        {
+          "id": "s",
+          "txn": "carpetv",
+          "png": "stream/models/vehicles/rrvigeroclassic__carpetv.png",
+          "w": 256,
+          "h": 256,
+          "label": "Carpetv"
+        },
+        {
+          "id": "t",
+          "txn": "SEATBELT_1",
+          "png": "stream/models/vehicles/rrvigeroclassic__seatbelt_1.png",
+          "w": 256,
+          "h": 256,
+          "label": "SEATBELT 1"
+        },
+        {
+          "id": "u",
+          "txn": "wood_016_diff",
+          "png": "stream/models/vehicles/rrvigeroclassic__wood_016_diff.png",
+          "w": 256,
+          "h": 256,
+          "label": "Wood 016 Diff"
+        },
+        {
+          "id": "v",
+          "txn": "che_camaross_69_symbolsembossed_001_DIFF",
+          "png": "stream/models/vehicles/rrvigeroclassic__che_camaross_69_symbolsembossed_001_diff.png",
+          "w": 256,
+          "h": 256,
+          "label": "Che Camaross 69 Symbolsembossed 001 DIFF"
+        },
+        {
+          "id": "w",
+          "txn": "screw_015",
+          "png": "stream/models/vehicles/rrvigeroclassic__screw_015.png",
+          "w": 256,
+          "h": 256,
+          "label": "Screw 015"
+        },
+        {
+          "id": "x",
+          "txn": "gls_ridges_005_diff",
+          "png": "stream/models/vehicles/rrvigeroclassic__gls_ridges_005_diff.png",
+          "w": 256,
+          "h": 256,
+          "label": "Gls Ridges 005 Diff"
+        },
+        {
+          "id": "y",
+          "txn": "screw_036",
+          "png": "stream/models/vehicles/rrvigeroclassic__screw_036.png",
+          "w": 256,
+          "h": 256,
+          "label": "Screw 036"
+        },
+        {
+          "id": "z",
+          "txn": "carbon_c",
+          "png": "stream/models/vehicles/rrvigeroclassic__carbon_c.png",
+          "w": 256,
+          "h": 256,
+          "label": "Carbon C"
+        },
+        {
+          "id": "{",
+          "txn": "rim_color",
+          "png": "stream/models/vehicles/rrvigeroclassic__rim_color.png",
+          "w": 256,
+          "h": 256,
+          "label": "Rim Color"
+        },
+        {
+          "id": "|",
+          "txn": "zzzzzzDIF",
+          "png": "stream/models/vehicles/rrvigeroclassic__zzzzzzdif.png",
+          "w": 128,
+          "h": 128,
+          "label": "ZzzzzzDIF"
+        },
+        {
+          "id": "}",
+          "txn": "ptn_grillhexagon_001_diff",
+          "png": "stream/models/vehicles/rrvigeroclassic__ptn_grillhexagon_001_diff.png",
+          "w": 128,
+          "h": 128,
+          "label": "Ptn Grillhexagon 001 Diff"
+        },
+        {
+          "id": "~",
+          "txn": "vehicle_generic_mesh5_d",
+          "png": "stream/models/vehicles/rrvigeroclassic__vehicle_generic_mesh5_d.png",
+          "w": 128,
+          "h": 128,
+          "label": "Vehicle Generic Mesh5 D"
+        },
+        {
+          "id": "",
+          "txn": "emzone_plasmase",
+          "png": "stream/models/vehicles/rrvigeroclassic__emzone_plasmase.png",
+          "w": 128,
+          "h": 128,
+          "label": "Emzone Plasmase"
+        },
+        {
+          "id": "",
+          "txn": "glass2",
+          "png": "stream/models/vehicles/rrvigeroclassic__glass2.png",
+          "w": 128,
+          "h": 128,
+          "label": "Glass2"
+        },
+        {
+          "id": "",
+          "txn": "28",
+          "png": "stream/models/vehicles/rrvigeroclassic__28.png",
+          "w": 64,
+          "h": 64,
+          "label": "28"
+        },
+        {
+          "id": "",
+          "txn": "11BLACK",
+          "png": "stream/models/vehicles/rrvigeroclassic__11black.png",
+          "w": 64,
+          "h": 64,
+          "label": "11BLACK"
+        },
+        {
+          "id": "",
+          "txn": "26",
+          "png": "stream/models/vehicles/rrvigeroclassic__26.png",
+          "w": 64,
+          "h": 64,
+          "label": "26"
+        },
+        {
+          "id": "",
+          "txn": "stitch_003_opac",
+          "png": "stream/models/vehicles/rrvigeroclassic__stitch_003_opac.png",
+          "w": 64,
+          "h": 64,
+          "label": "Stitch 003 Opac"
+        },
+        {
+          "id": "",
+          "txn": "glass22",
+          "png": "stream/models/vehicles/rrvigeroclassic__glass22.png",
+          "w": 64,
+          "h": 64,
+          "label": "Glass22"
+        },
+        {
+          "id": "",
+          "txn": "chrome",
+          "png": "stream/models/vehicles/rrvigeroclassic__chrome.png",
+          "w": 64,
+          "h": 64,
+          "label": "Chrome"
+        },
+        {
+          "id": "",
+          "txn": "rgba4d0000ff",
+          "png": "stream/models/vehicles/rrvigeroclassic__rgba4d0000ff.png",
+          "w": 32,
+          "h": 32,
+          "label": "Rgba4d0000ff"
+        },
+        {
+          "id": "",
+          "txn": "rgba072f2bff",
+          "png": "stream/models/vehicles/rrvigeroclassic__rgba072f2bff.png",
+          "w": 32,
+          "h": 32,
+          "label": "Rgba072f2bff"
+        },
+        {
+          "id": "",
+          "txn": "rgba020653ff",
+          "png": "stream/models/vehicles/rrvigeroclassic__rgba020653ff.png",
+          "w": 32,
+          "h": 32,
+          "label": "Rgba020653ff"
+        },
+        {
+          "id": "",
+          "txn": "zchrom",
+          "png": "stream/models/vehicles/rrvigeroclassic__zchrom.png",
+          "w": 8,
+          "h": 8,
+          "label": "Zchrom"
+        },
+        {
+          "id": "",
+          "txn": "black",
+          "png": "stream/models/vehicles/rrvigeroclassic__black.png",
+          "w": 4,
+          "h": 4,
+          "label": "Black"
+        },
+        {
+          "id": "",
+          "txn": "slamvan_black",
+          "png": "stream/models/vehicles/rrvigeroclassic__slamvan_black.png",
+          "w": 4,
+          "h": 4,
+          "label": "Slamvan Black"
+        }
+      ],
+      "txd": "rrvigeroclassic",
+      "txn": "ss69_sign_1",
+      "id": "veh_rrvigeroclassic",
+      "name": "Rrvigeroclassic",
+      "model": "rrvigeroclassic",
+      "class": "vehicle",
+      "src": "templates/rrvigeroclassic"
+    }
+  ]
+}

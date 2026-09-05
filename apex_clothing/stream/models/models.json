@@ -1,0 +1,4 @@
+{
+  "_comment": "Optional manual catalog used when Config.templates.autoScan = false. Normally left empty — tools/convert.js writes templates.json instead.",
+  "templates": []
+}

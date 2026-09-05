@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="referrer" content="no-referrer">
+    <title>Apex Billboards</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css?v=12">
+</head>
+<body class="hidden-ui">
+
+<!-- Toasts stay usable even with the studio closed -->
+<div id="toasts"></div>
+
+<!-- ─── Placement overlays ────────────────────────────────── -->
+<div id="reticle"><span></span></div>
+
+<div id="measure">
+    <span class="mr-k" data-i18n="surface">SURFACE</span>
+    <b id="measure-val">—</b>
+</div>
+
+<footer id="hudbar">
+    <span class="hb-live"><i></i><em id="hud-text">Place the first corner</em></span>
+    <span class="hb-keys">
+        <span><b>LMB</b> <em data-i18n="key_place">Place</em></span>
+        <span><b>RMB</b> <em data-i18n="key_undo">Undo / Cancel</em></span>
+        <span><b>E</b> <em data-i18n="key_close_shape">Close shape</em></span>
+        <span class="hb-sep"></span>
+        <span><b>W A S D</b> <em data-i18n="key_fly">Fly</em></span>
+        <span><b>SPACE</b> <em data-i18n="key_up">Up</em></span>
+        <span><b>CTRL</b> <em data-i18n="key_down">Down</em></span>
+        <span><b>SHIFT</b> <em data-i18n="key_boost">Boost</em></span>
+        <span><b>SCROLL</b> <i id="hud-speed">Speed</i></span>
+    </span>
+</footer>
+
+<!-- ─── Topbar ────────────────────────────────────────────── -->
+<header id="topbar">
+    <div class="brand">
+        <div class="brand-mark"><i class="fa-solid fa-tower-broadcast"></i></div>
+        <div class="brand-wm">APEX <span class="ac">BILLBOARDS</span></div>
+    </div>
+    <span class="tb-sep"></span>
+    <button class="tbtn st-tab active" data-tab="create"><i class="fa-solid fa-plus"></i> <span data-i18n="tab_create">New billboard</span></button>
+    <button class="tbtn st-tab" data-tab="manage"><i class="fa-solid fa-signal"></i> <span data-i18n="tab_manage">Network</span> <span class="cnt" id="board-count">0</span></button>
+    <span class="tb-sep"></span>
+    <button class="tbtn icon" id="dock-toggle" data-i18n-title="collapse_panel" title="Collapse panel"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="tb-spacer"></div>
+    <span class="tb-tag fly"><b>RMB</b> <em data-i18n="fly_hint">Look</em> · <b>WASD</b> <em data-i18n="fly_hint2">Fly</em> · <b>Space/Ctrl</b> <em data-i18n="fly_hint3">Up/Down</em></span>
+    <span class="tb-sep"></span>
+    <span class="tb-tag"><i class="fa-solid fa-database"></i> <em id="mg-count">0 placed</em></span>
+    <span class="tb-sep"></span>
+    <button class="tbtn icon" id="st-close" data-i18n-title="close" title="Close"><i class="fa-solid fa-xmark"></i></button>
+</header>
+
+<!-- slim handle to slide the dock back in when collapsed -->
+<button id="dock-reveal" data-i18n-title="open_panel" title="Open panel"><i class="fa-solid fa-chevron-right"></i><span data-i18n="panel">PANEL</span></button>
+
+<!-- ─── Left dock ─────────────────────────────────────────── -->
+<aside id="dock">
+
+    <!-- ══ NEW BILLBOARD (vertical numbered flow) ══ -->
+    <section id="view-create" class="view active">
+
+        <div class="sec" data-step="shape">
+            <header class="sec-head">
+                <span class="sec-num">01</span><b data-i18n="step_surface">SURFACE</b>
+                <span class="sec-state"></span>
+            </header>
+            <div id="step-shape" class="step active">
+                <label class="fld">
+                    <div class="fld-top"><span><span data-i18n="name">Name</span> <em>*</em></span><span class="counter" id="name-count">0/40</span></div>
+                    <input type="text" id="in-name" maxlength="40" data-i18n-ph="name_placeholder" placeholder="Vinewood North">
+                </label>
+
+                <div class="fld-top"><span data-i18n="placement">Placement</span></div>
+                <div class="seg" id="seg-mode">
+                    <button class="on" data-mode="world"><i class="fa-solid fa-mountain-city"></i> <span data-i18n="world">World</span></button>
+                    <button data-mode="vehicle"><i class="fa-solid fa-car-side"></i> <span data-i18n="vehicle">Vehicle</span></button>
+                </div>
+                <p class="hint" id="mode-hint">Trace any wall, rooftop, panel or floor in the world.</p>
+
+                <div class="fld-top"><span data-i18n="shape">Shape</span></div>
+                <div id="shape-grid">
+                    <button class="shape on" data-shape="free"><i class="fa-regular fa-image"></i><b data-i18n="shape_free">Image</b></button>
+                    <button class="shape" data-shape="rect"><i class="fa-regular fa-square"></i><b data-i18n="shape_rect">Rect</b></button>
+                    <button class="shape" data-shape="circle"><i class="fa-regular fa-circle"></i><b data-i18n="shape_circle">Circle</b></button>
+                    <button class="shape" data-shape="poly"><i class="fa-solid fa-draw-polygon"></i><b data-i18n="shape_poly">Poly</b></button>
+                    <button class="shape" data-shape="wrap"><i class="fa-solid fa-code-branch"></i><b data-i18n="shape_wrap">Wrap</b></button>
+                </div>
+                <p class="hint" id="shape-hint">One click on a surface, then adjust the size. Keeps the image's own proportions.</p>
+
+                <button id="btn-select-nodes" class="cta">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                    <span><b id="cta-title">Place image</b><i id="cta-sub">fly and click once on a surface</i></span>
+                    <em>LMB</em>
+                </button>
+            </div>
+        </div>
+
+        <div class="sec locked" data-step="place">
+            <header class="sec-head">
+                <span class="sec-num">02</span><b data-i18n="step_trace">TRACE</b>
+                <span class="sec-state"></span>
+            </header>
+            <div id="step-place" class="step">
+                <div class="trace-report">
+                    <div class="tr-row main"><span data-i18n="result">result</span><b id="cc-dims">—</b></div>
+                    <div class="tr-row"><span data-i18n="source">source</span><b id="cc-px">—</b></div>
+                    <div class="tr-row"><span data-i18n="nodes">nodes</span><b id="cc-nodes">—</b></div>
+                </div>
+
+                <!-- 'Image' shape only: live size + rotation -->
+                <div id="free-size" style="display:none">
+                    <div class="fld-top" style="margin-top:14px"><span data-i18n="size_width">Size (width)</span>
+                        <span class="counter"><b id="size-val">4.0 m</b></span></div>
+                    <input type="range" id="in-size" min="5" max="400" step="1" value="40">
+                    <p class="hint" data-i18n="hint_size">Height follows the image's own proportions — it never stretches.</p>
+
+                    <div class="fld-top"><span data-i18n="rotation">Rotation</span>
+                        <span class="counter"><b id="rot-val">0°</b></span></div>
+                    <input type="range" id="in-rot" min="-180" max="180" step="1" value="0">
+                </div>
+
+                <div class="fld-top" style="margin-top:14px"><span data-i18n="depth">Depth</span>
+                    <span class="counter"><b id="depth-val">3 cm</b></span></div>
+                <div class="depth-row">
+                    <input type="range" id="in-depth" min="-200" max="200" step="1" value="3">
+                    <input type="number" id="in-depth-num" step="0.05" value="0.03" data-i18n-title="depth_metres" title="metres — type any value">
+                    <span class="unit">m</span>
+                </div>
+                <p class="hint" data-i18n="hint_depth">Live: drag and watch the surface slide off the wall.</p>
+
+                <div class="step-nav">
+                    <button class="btn ghost" id="btn-retry"><i class="fa-solid fa-rotate-left"></i> <span data-i18n="retry">Retry</span></button>
+                    <button class="btn primary" id="btn-confirm-surface" data-i18n="confirm_surface">Confirm surface</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sec locked" data-step="content">
+            <header class="sec-head">
+                <span class="sec-num">03</span><b data-i18n="step_content">CONTENT</b>
+                <span class="sec-state"></span>
+            </header>
+            <div id="step-content" class="step">
+                <div id="wizard-editor"></div>
+                <div class="step-nav">
+                    <button class="btn ghost" id="btn-content-back"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="btn primary" id="btn-content-next" data-i18n="continue">Continue</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sec locked" data-step="create">
+            <header class="sec-head">
+                <span class="sec-num">04</span><b data-i18n="step_publish">PUBLISH</b>
+                <span class="sec-state"></span>
+            </header>
+            <div id="step-create" class="step">
+                <div id="summary"></div>
+
+                <div class="fld-top"><span data-i18n="depth">Depth</span><span class="counter"><b id="off-val">3 cm</b></span></div>
+                <div class="depth-row">
+                    <input type="range" id="in-offset" min="-200" max="200" step="1" value="3">
+                    <input type="number" id="in-offset-num" step="0.05" value="0.03" data-i18n-title="depth_metres" title="metres — type any value">
+                    <span class="unit">m</span>
+                </div>
+                <p class="hint" data-i18n="hint_offset">Push the surface off the wall so it doesn't clip — updates live.</p>
+
+                <div class="fld-top"><span data-i18n="render_distance">Render distance</span><span class="counter"><b id="dist-val">400 m</b></span></div>
+                <input type="range" id="in-dist" min="20" max="2000" step="20" value="400">
+
+                <label class="switch-row">
+                    <span><i class="fa-solid fa-clone"></i> <span data-i18n="double_sided">Double-sided</span></span>
+                    <span class="switch"><input type="checkbox" id="in-double"><i></i></span>
+                </label>
+
+                <div class="step-nav">
+                    <button class="btn ghost" id="btn-create-back"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button class="btn primary" id="btn-create"><i class="fa-solid fa-tower-broadcast"></i> <span data-i18n="publish">Publish billboard</span></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="wiz-foot">
+            <button class="link" id="btn-cancel-wizard"><i class="fa-solid fa-ban"></i> <span data-i18n="discard">Discard draft</span></button>
+        </div>
+    </section>
+
+    <!-- ══ NETWORK (manage) ══ -->
+    <section id="view-manage" class="view">
+        <div id="mg-top">
+            <div class="search"><i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="mg-search" data-i18n-ph="search" placeholder="Search billboards…">
+            </div>
+        </div>
+        <div id="mg-list"></div>
+        <div id="mg-empty" style="display:none">
+            <i class="fa-solid fa-tower-broadcast"></i>
+            <b data-i18n="empty_title">Network offline</b>
+            <span data-i18n="empty_sub">No billboards yet — publish your first one.</span>
+        </div>
+    </section>
+</aside>
+
+<!-- ─── Edit modal (dashboard) ────────────────────────────── -->
+<div id="modal-edit" class="modal">
+    <div class="modal-card">
+        <header><span class="mh-num" data-i18n="edit">EDIT</span><b id="ed-title" data-i18n="billboard">BILLBOARD</b>
+            <button class="mclose" data-close="modal-edit"><i class="fa-solid fa-xmark"></i></button>
+        </header>
+        <div class="modal-body">
+            <label class="fld">
+                <div class="fld-top"><span data-i18n="name">Name</span></div>
+                <input type="text" id="ed-name" maxlength="40">
+            </label>
+            <div id="edit-editor"></div>
+
+            <div class="fld-top"><span data-i18n="depth">Depth</span><span class="counter"><b id="ed-off-val">3 cm</b></span></div>
+            <div class="depth-row">
+                <input type="range" id="ed-offset" min="-200" max="200" step="1" value="3">
+                <input type="number" id="ed-offset-num" step="0.05" value="0.03" data-i18n-title="depth_metres" title="metres — type any value">
+                <span class="unit">m</span>
+            </div>
+            <div class="fld-top"><span data-i18n="render_distance">Render distance</span><span class="counter"><b id="ed-dist-val">400 m</b></span></div>
+            <input type="range" id="ed-dist" min="20" max="2000" step="20" value="400">
+            <label class="switch-row">
+                <span><i class="fa-solid fa-clone"></i> <span data-i18n="double_sided">Double-sided</span></span>
+                <span class="switch"><input type="checkbox" id="ed-double"><i></i></span>
+            </label>
+            <label class="switch-row">
+                <span><i class="fa-solid fa-power-off"></i> <span data-i18n="enabled">Enabled</span></span>
+                <span class="switch"><input type="checkbox" id="ed-enabled" checked><i></i></span>
+            </label>
+        </div>
+        <footer>
+            <button class="btn ghost" data-close="modal-edit" data-i18n="cancel">Cancel</button>
+            <button class="btn primary" id="ed-save"><i class="fa-solid fa-floppy-disk"></i> <span data-i18n="save">Save</span></button>
+        </footer>
+    </div>
+</div>
+
+<!-- ─── Confirm modal ─────────────────────────────────────── -->
+<div id="modal-confirm" class="modal">
+    <div class="modal-card small">
+        <header><span class="mh-num danger" data-i18n="del">DEL</span><b id="cf-title" data-i18n="billboard">BILLBOARD</b>
+            <button class="mclose" data-close="modal-confirm"><i class="fa-solid fa-xmark"></i></button>
+        </header>
+        <div class="modal-body"><p id="cf-text">Are you sure?</p></div>
+        <footer>
+            <button class="btn ghost" data-close="modal-confirm" data-i18n="cancel">Cancel</button>
+            <button class="btn danger" id="cf-yes"><i class="fa-solid fa-trash"></i> <span data-i18n="delete">Delete</span></button>
+        </footer>
+    </div>
+</div>
+
+<script src="js/app.js?v=12"></script>
+</body>
+</html>
